@@ -1,0 +1,53 @@
+rules_version = '2';
+// JB MUSIC 관리앱 보안 규칙: Firebase 콘솔 > Firestore Database > 규칙 탭에 붙여넣고 [게시]
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() { return request.auth != null; }
+    function hasAcct() { return signedIn() && exists(/databases/$(database)/documents/accounts/$(request.auth.uid)); }
+    function acct() { return get(/databases/$(database)/documents/accounts/$(request.auth.uid)).data; }
+    function isAdmin() { return hasAcct() && acct().role == 'admin'; }
+    function isStaff() { return hasAcct() && acct().role in ['admin', 'teacher']; }
+    function myTid() { return acct().get('tid', ''); }
+
+    // 처음 설정: 관리자가 아무도 없을 때 딱 한 번만 만들 수 있음
+    match /setup/{doc} {
+      allow read: if true;
+      allow create: if doc == 'owner' && signedIn() && request.resource.data.uid == request.auth.uid;
+    }
+    match /accounts/{uid} {
+      allow read: if signedIn() && (request.auth.uid == uid || isAdmin());
+      allow create: if isAdmin() || (
+        signedIn() && uid == request.auth.uid && request.resource.data.role == 'admin'
+        && !exists(/databases/$(database)/documents/setup/owner)
+        && getAfter(/databases/$(database)/documents/setup/owner).data.uid == request.auth.uid);
+      allow update: if isAdmin();
+      allow delete: if isAdmin() && uid != request.auth.uid;
+    }
+    match /config/{doc} {
+      allow read: if isStaff();
+      allow write: if isAdmin();
+    }
+    match /teachers/{id} {
+      allow read: if isStaff();
+      allow write: if isAdmin();
+    }
+    match /students/{id} {
+      allow read: if isStaff();
+      allow write: if isAdmin();
+    }
+    match /slots/{id} {
+      allow read: if isStaff();
+      allow write: if isAdmin();
+    }
+    match /regs/{id} {
+      allow read: if isStaff();
+      allow write: if isAdmin();
+    }
+    // 수업 기록: 관리자는 전부, 선생님은 자기 수업만 쓰고 지울 수 있음
+    match /lessons/{id} {
+      allow read: if isStaff();
+      allow create, update: if isAdmin() || (isStaff() && request.resource.data.tid == myTid());
+      allow delete: if isAdmin() || (isStaff() && resource.data.tid == myTid());
+    }
+  }
+}

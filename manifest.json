@@ -1,0 +1,8 @@
+{
+  "name": "JB MUSIC 수업 관리",
+  "short_name": "JB MUSIC",
+  "start_url": "/jb-music/",
+  "display": "standalone",
+  "background_color": "#F4F6F8",
+  "theme_color": "#14213D"
+}

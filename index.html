@@ -1,0 +1,981 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#14213D">
+<link rel="manifest" href="manifest.json">
+<title>JB MUSIC 관리</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+:root{--ink:#14213D;--ink2:#3D4A66;--gy:#6B7489;--gy2:#A9B0BF;--bd:#E2E6EC;--bg:#F4F6F8;--wh:#fff;
+--ac:#1F6F78;--acb:#E6F2F3;--ac2:#2A8F9A;
+--ok:#15803d;--okb:#e9f8ee;--no:#dc2626;--nob:#fdecec;--ext:#2563eb;--extb:#eaf1ff;--off:#6b7280;--offb:#f0f1f3;--mk:#b45309;--mkb:#fff4de}
+body{font-family:'Apple SD Gothic Neo','Malgun Gothic','Noto Sans KR',system-ui,sans-serif;background:var(--bg);color:var(--ink);font-size:15px;line-height:1.45}
+button{font-family:inherit;font-size:inherit;cursor:pointer;border:none;background:none;color:inherit}
+input,select,textarea{font-family:inherit;font-size:16px;color:var(--ink)}
+.hide{display:none!important}
+/* 상단 */
+.top{position:sticky;top:0;z-index:20;background:var(--ink);color:#fff;display:flex;align-items:center;gap:10px;padding:10px 14px;padding-top:max(10px,env(safe-area-inset-top))}
+.top .logo{font-weight:800;letter-spacing:.5px;font-size:16px}
+.top .logo small{font-weight:500;opacity:.7;margin-left:4px;font-size:12px}
+.top .me{margin-left:auto;font-size:12px;opacity:.85;text-align:right}
+.demo-tag{background:#f59e0b;color:#111;font-size:11px;font-weight:700;padding:2px 7px;border-radius:99px}
+/* 탭 */
+.tabs{display:flex;background:var(--wh);border-bottom:1px solid var(--bd);position:sticky;top:44px;z-index:19;overflow-x:auto}
+.tabs button{flex:1;min-width:64px;padding:11px 6px;font-size:14px;font-weight:600;color:var(--gy);border-bottom:2.5px solid transparent;white-space:nowrap}
+.tabs button.on{color:var(--ac);border-bottom-color:var(--ac)}
+main{max-width:1180px;margin:0 auto;padding:14px 12px 90px}
+h2{font-size:18px;margin:4px 0 10px}
+h3{font-size:15px;margin:0 0 8px}
+.card{background:var(--wh);border:1px solid var(--bd);border-radius:14px;padding:14px;margin-bottom:12px}
+.row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.sp{flex:1}
+.muted{color:var(--gy);font-size:13px}
+.small{font-size:12px}
+.btn{background:var(--ac);color:#fff;padding:9px 14px;border-radius:10px;font-weight:700;font-size:14px}
+.btn:disabled{opacity:.5}
+.btn.ghost{background:var(--wh);color:var(--ac);border:1px solid var(--ac)}
+.btn.gray{background:var(--offb);color:var(--ink2)}
+.btn.red{background:var(--nob);color:var(--no)}
+.btn.sm{padding:5px 10px;font-size:12.5px;border-radius:8px}
+.pill{display:inline-flex;align-items:center;gap:3px;padding:2px 8px;border-radius:99px;font-size:12px;font-weight:700;white-space:nowrap}
+.k{display:inline-block;font-size:10.5px;font-weight:800;padding:0 5px;border-radius:5px;color:#fff;line-height:16px;vertical-align:1px}
+.st-출석{background:var(--okb);color:var(--ok)}.st-결석{background:var(--nob);color:var(--no)}.st-연장{background:var(--extb);color:var(--ext)}.st-휴강{background:var(--offb);color:var(--off)}.st-보강{background:var(--mkb);color:var(--mk)}
+.st-none{background:#fff;color:var(--gy2);border:1px dashed var(--gy2)}
+.seg{display:inline-flex;background:var(--offb);border-radius:10px;padding:3px}
+.seg button{padding:6px 12px;border-radius:8px;font-size:13px;font-weight:700;color:var(--gy)}
+.seg button.on{background:var(--wh);color:var(--ink);box-shadow:0 1px 2px rgba(0,0,0,.08)}
+.nav{display:flex;align-items:center;gap:6px}
+.nav button.ar{width:34px;height:34px;border-radius:10px;background:var(--wh);border:1px solid var(--bd);font-size:16px}
+.nav .lbl{font-weight:800;min-width:120px;text-align:center}
+select.f,input.f,textarea.f{width:100%;padding:10px;border:1px solid var(--bd);border-radius:10px;background:#fff}
+textarea.f{min-height:70px;resize:vertical}
+label.l{display:block;font-size:12.5px;font-weight:700;color:var(--ink2);margin:10px 0 4px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:0 10px}
+.banner{background:var(--mkb);border:1px solid #f6d58f;color:#7a4b06;border-radius:12px;padding:10px 12px;font-size:13.5px;margin-bottom:12px}
+.banner.info{background:var(--acb);border-color:#bfdfe2;color:#0f4f56}
+.empty{padding:26px 10px;text-align:center;color:var(--gy);font-size:14px}
+/* 오늘 */
+.lrow{display:flex;align-items:center;gap:10px;padding:11px 4px;border-top:1px solid var(--bd)}
+.lrow:first-child{border-top:none}
+.lrow .t{width:50px;font-weight:800;font-size:14px}
+.lrow .t small{display:block;font-weight:500;color:var(--gy);font-size:11px}
+.lrow .who{flex:1;min-width:0}
+.lrow .who b{font-size:15px}
+.lrow .who .sub{font-size:12.5px;color:var(--gy);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lrow.done{opacity:.92}
+.lrow.miss .t{color:var(--no)}
+/* 시간표 */
+.tt-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+table.tt{border-collapse:collapse;width:100%;min-width:340px;table-layout:fixed}
+@media(max-width:600px){table.tt td.h,table.tt th:first-child{width:40px!important;font-size:11px}.it{font-size:11.5px;padding:2px 3px}table.tt th,table.tt td{padding:2px}}
+table.tt th,table.tt td{border:1px solid var(--bd);font-size:12.5px;text-align:center;vertical-align:top;padding:3px}
+table.tt th{background:#F8FAFB;font-weight:700;color:var(--ink2);padding:6px 2px}
+table.tt th.today{background:var(--acb);color:var(--ac)}
+table.tt td.h{width:52px;color:var(--gy);font-weight:700;background:#FBFCFD;vertical-align:middle}
+table.tt td.cell{height:44px;cursor:pointer}
+table.tt td.cell:hover{background:#FAFCFD}
+table.tt td.off{background:repeating-linear-gradient(135deg,#fafafa,#fafafa 6px,#f3f4f6 6px,#f3f4f6 12px)}
+.it{display:block;border-radius:7px;padding:3px 4px;margin:1px 0;font-weight:700;line-height:1.25;text-align:left;background:#F2F6FA;border-left:3px solid var(--ac);font-size:12.5px;word-break:keep-all}
+.it .tm{font-weight:500;font-size:10.5px;color:var(--gy);display:block}
+.it.grp{background:#EEF0F7;border-left-color:#5b5f97}
+.it.cont{opacity:.45;font-weight:500}
+.it.x{border-left-style:dashed}
+.it .s{display:inline-block;font-size:10px;padding:0 4px;border-radius:4px;margin-left:2px}
+.it.conflict{outline:2px solid var(--no)}
+.tch-h{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.dot{width:10px;height:10px;border-radius:50%;display:inline-block}
+/* 학생 */
+.srow{display:flex;align-items:center;gap:10px;padding:11px 4px;border-top:1px solid var(--bd);cursor:pointer}
+.srow:first-child{border-top:none}
+.srow .nm{font-weight:800;font-size:15px}
+table.log{width:100%;border-collapse:collapse;font-size:13.5px}
+table.log th{font-size:12px;color:var(--gy);font-weight:700;text-align:left;padding:7px 6px;border-bottom:1px solid var(--bd)}
+table.log td{padding:8px 6px;border-bottom:1px solid #EEF0F3;vertical-align:top}
+table.log tr{cursor:pointer}
+table.log tr:hover td{background:#FAFCFD}
+/* 현황 */
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:12px}
+.kpi{background:var(--wh);border:1px solid var(--bd);border-radius:14px;padding:12px}
+.kpi .v{font-size:24px;font-weight:800}
+.kpi .n{font-size:12.5px;color:var(--gy);font-weight:700}
+table.dt{width:100%;border-collapse:collapse;font-size:13.5px}
+table.dt th{font-size:12px;color:var(--gy);text-align:left;padding:7px 6px;border-bottom:1px solid var(--bd);font-weight:700;white-space:nowrap}
+table.dt td{padding:8px 6px;border-bottom:1px solid #EEF0F3;white-space:nowrap}
+table.dt td.num,table.dt th.num{text-align:right}
+.cols2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(max-width:760px){.kpis{grid-template-columns:repeat(2,1fr)}.cols2{grid-template-columns:1fr}}
+/* 모달 */
+.ov{position:fixed;inset:0;background:rgba(15,20,35,.45);z-index:50;display:flex;align-items:flex-end;justify-content:center}
+.md{background:#fff;width:100%;max-width:520px;max-height:92vh;overflow-y:auto;border-radius:18px 18px 0 0;padding:16px 16px calc(18px + env(safe-area-inset-bottom))}
+@media(min-width:700px){.ov{align-items:center}.md{border-radius:18px}}
+.md .mh{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.md .mh h3{margin:0;font-size:17px}
+.md .x{margin-left:auto;font-size:22px;color:var(--gy);width:34px;height:34px}
+.stbtns{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}
+.stbtns button{padding:10px 0;border-radius:10px;font-weight:800;font-size:14px;border:1.5px solid var(--bd);background:#fff;color:var(--gy)}
+.stbtns button.on{border-color:currentColor}
+.stbtns button.on.st-출석{background:var(--okb);color:var(--ok)}.stbtns button.on.st-결석{background:var(--nob);color:var(--no)}.stbtns button.on.st-연장{background:var(--extb);color:var(--ext)}.stbtns button.on.st-휴강{background:var(--offb);color:var(--off)}.stbtns button.on.st-보강{background:var(--mkb);color:var(--mk)}
+.mfoot{display:flex;gap:8px;margin-top:16px}
+.mfoot .btn{flex:1;padding:12px}
+.toast{position:fixed;left:50%;bottom:28px;transform:translateX(-50%);background:var(--ink);color:#fff;padding:10px 16px;border-radius:12px;font-size:14px;font-weight:600;z-index:80;box-shadow:0 6px 20px rgba(0,0,0,.2)}
+/* 로그인 */
+.login{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;background:linear-gradient(160deg,#14213D,#1F3A5F 60%,#1F6F78)}
+.login .box{background:#fff;border-radius:20px;padding:26px 22px;width:100%;max-width:360px}
+.login h1{font-size:22px;margin-bottom:2px}
+.err{color:var(--no);font-size:13px;min-height:18px;margin-top:8px}
+.chip{display:inline-block;padding:5px 10px;border:1px solid var(--bd);border-radius:99px;font-size:13px;font-weight:700;color:var(--ink2);background:#fff;margin:2px}
+.chip.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+</style>
+</head>
+<body>
+<div id="app"></div>
+
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script>
+/* ============================================================
+   JB MUSIC 관리앱
+   - 전용 Firebase 프로젝트(jb-music-1189a) 사용. 오디션앱과 완전히 분리
+   - 계정: accounts/{uid} = {role:'admin'|'teacher', loginId, name, tid}
+   - 처음 한 번: setup/owner 문서가 없으면 '관리자 계정 만들기' 화면이 나옴
+   - ?demo 를 붙이면 Firebase 없이 체험 데이터로 동작 (브라우저에만 저장)
+   ============================================================ */
+const FC={apiKey:"AIzaSyC1T_cr86nyta4c2qm4HNndgiSewlqNlQE",authDomain:"jb-music-1189a.firebaseapp.com",projectId:"jb-music-1189a",storageBucket:"jb-music-1189a.firebasestorage.app",messagingSenderId:"164994191125",appId:"1:164994191125:web:3a279b3f9e961dc6de231c"};
+const DEMO=new URLSearchParams(location.search).has('demo');
+let db=null;
+if(!DEMO&&window.firebase){firebase.initializeApp(FC);db=firebase.firestore();}
+
+/* ---------- 기본 값 ---------- */
+const COL={teachers:'teachers',students:'students',slots:'slots',lessons:'lessons',regs:'regs'};
+const KIND={A:{t:'오디션',c:'#7c3aed'},KA:{t:'키즈오디션',c:'#db2777'},H:{t:'취미',c:'#0891b2'},E:{t:'입시',c:'#ea580c'}};
+const SUBJ={V:'보컬',P:'피아노',C:'작곡',CP:'작곡·피아노',G:'기타',M:'미디',D:'드럼',ETC:'기타과목'};
+const STATUS=['출석','결석','연장','휴강','보강'];
+const COUNTED=new Set(['출석','결석','보강']); // 회차에 들어가는 출결 (연장·휴강은 회차를 쓰지 않음)
+const ROOMS_DEFAULT=['L1','L2','L3','L4','L5','L6','L7','L8','JB홀'];
+const TCOLORS=['#1F6F78','#7c3aed','#db2777','#ea580c','#2563eb','#15803d','#b45309','#0f766e','#9333ea','#be123c'];
+const DOW=['일','월','화','수','목','금','토'];
+const DAYS=[1,2,3,4,5,6,0];
+const LESSON_WINDOW_DAYS=150; // 처음 불러오는 수업 기록 범위 (무료 사용량 아끼기)
+
+/* ---------- 유틸 ---------- */
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const pad=n=>String(n).padStart(2,'0');
+const ds=d=>d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());
+const pd=s=>{const[y,m,d]=String(s).split('-').map(Number);return new Date(y,m-1,d);};
+const addD=(s,n)=>{const d=pd(s);d.setDate(d.getDate()+n);return ds(d);};
+const dow=s=>pd(s).getDay();
+const today=()=>ds(new Date());
+const monday=s=>{const w=dow(s);return addD(s,w===0?-6:1-w);};
+const fmtD=s=>{if(!s)return '';const d=pd(s);return (d.getMonth()+1)+'/'+d.getDate()+'('+DOW[d.getDay()]+')';};
+const fmtDY=s=>{if(!s)return '';const d=pd(s);return d.getFullYear()+'.'+pad(d.getMonth()+1)+'.'+pad(d.getDate())+' ('+DOW[d.getDay()]+')';};
+const rid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,8);
+const hr=t=>parseInt(String(t||'0').split(':')[0],10);
+const endTime=(t,dur)=>{const[h,m]=String(t).split(':').map(Number);const x=h*60+m+(+dur||60);return pad(Math.floor(x/60))+':'+pad(x%60);};
+const clean=o=>JSON.parse(JSON.stringify(o,(k,v)=>k&&k[0]==='_'?undefined:v));
+function toast(m){const t=document.createElement('div');t.className='toast';t.textContent=m;document.body.appendChild(t);setTimeout(()=>t.remove(),2200);}
+const kindBadge=k=>KIND[k]?`<span class="k" style="background:${KIND[k].c}">${k==='KA'?'K.A':k}</span>`:'';
+const stPill=s=>s?`<span class="pill st-${s}">${s}</span>`:`<span class="pill st-none">미기록</span>`;
+
+/* ---------- 상태 ---------- */
+let S={teachers:[],students:[],slots:[],lessons:[],regs:[],cfg:{rooms:ROOMS_DEFAULT.slice()},olderLoaded:{}};
+let ME=null; // {uid,name,admin,tid,loginId}
+let V={tab:'today',date:today(),week:monday(today()),ttMode:'teacher',ttMine:true,ttDay:null,stuQ:'',stuKind:'',stuTid:'',stuId:null,showOff:false};
+
+/* ---------- 저장소 (Firebase 또는 체험모드) ---------- */
+const LS_KEY='jbmusic_demo_v1';
+function demoSave(){try{localStorage.setItem(LS_KEY,JSON.stringify({teachers:S.teachers,students:S.students,slots:S.slots,lessons:S.lessons,regs:S.regs,cfg:S.cfg,accounts:DEMO_ACCTS}));}catch(e){}}
+let DEMO_ACCTS=[];
+const Store={
+  async load(){
+    if(DEMO){
+      let d=null;try{d=JSON.parse(localStorage.getItem(LS_KEY)||'null');}catch(e){}
+      if(d){Object.assign(S,{teachers:d.teachers||[],students:d.students||[],slots:d.slots||[],lessons:d.lessons||[],regs:d.regs||[],cfg:d.cfg||S.cfg});DEMO_ACCTS=d.accounts||[];}
+      else{DEMO_ACCTS=[{uid:'demo',role:'admin',loginId:'jbadmin',name:'원장님'}];}
+      return;
+    }
+    const since=addD(today(),-LESSON_WINDOW_DAYS);
+    const [t,s,sl,l,r,c]=await Promise.all([
+      db.collection(COL.teachers).get(),db.collection(COL.students).get(),db.collection(COL.slots).get(),
+      db.collection(COL.lessons).where('date','>=',since).get(),db.collection(COL.regs).get(),
+      db.collection('config').doc('main').get().catch(()=>null)]);
+    const arr=q=>{const a=[];q.forEach(d=>a.push({...d.data(),id:d.id}));return a;};
+    S.teachers=arr(t);S.students=arr(s);S.slots=arr(sl);S.lessons=arr(l);S.regs=arr(r);
+    if(c&&c.exists&&c.data().rooms)S.cfg.rooms=c.data().rooms;
+  },
+  async put(key,obj){
+    if(!obj.id)obj.id=rid();
+    obj.at=Date.now();obj.by=ME?ME.name:'';
+    const i=S[key].findIndex(x=>x.id===obj.id);if(i>=0)S[key][i]=obj;else S[key].push(obj);
+    if(DEMO){demoSave();return obj;}
+    const {id,...rest}=obj;await db.collection(COL[key]).doc(id).set(clean(rest));return obj;
+  },
+  async del(key,id){
+    S[key]=S[key].filter(x=>x.id!==id);
+    if(DEMO){demoSave();return;}
+    await db.collection(COL[key]).doc(id).delete();
+  },
+  async saveCfg(){if(DEMO){demoSave();return;}await db.collection('config').doc('main').set(clean(S.cfg));},
+  async loadStudentAll(sid){
+    if(DEMO||S.olderLoaded[sid])return;
+    const q=await db.collection(COL.lessons).where('sid','==',sid).get();
+    q.forEach(d=>{if(!S.lessons.some(x=>x.id===d.id))S.lessons.push({...d.data(),id:d.id});});
+    S.olderLoaded[sid]=true;
+  }
+};
+
+/* ---------- 계산 ---------- */
+const T=id=>S.teachers.find(x=>x.id===id);
+const ST=id=>S.students.find(x=>x.id===id);
+const tName=id=>(T(id)||{}).name||'(선생님?)';
+const sName=id=>(ST(id)||{}).name||'(학생?)';
+const tColor=id=>{const t=T(id);return t&&t.color||'#1F6F78';};
+const activeTeachers=()=>S.teachers.filter(t=>!t.off).sort((a,b)=>(a.order??99)-(b.order??99)||a.name.localeCompare(b.name));
+function slotOn(s,date){return s.day===dow(date)&&(!s.from||s.from<=date)&&(!s.to||date<=s.to);}
+function occ(date,tid){return S.slots.filter(s=>(!tid||s.tid===tid)&&slotOn(s,date)).sort((a,b)=>a.time.localeCompare(b.time));}
+function lessonOf(slot,date){return S.lessons.find(l=>l.slotId===slot.id&&l.date===date);}
+function extras(date,tid){const on=new Set(occ(date).map(s=>s.id));return S.lessons.filter(l=>l.date===date&&(!tid||l.tid===tid)&&!(l.slotId&&on.has(l.slotId)));}
+const myTid=()=>ME&&ME.tid;
+const canEditLesson=l=>ME.admin||(l.tid&&l.tid===myTid());
+
+// 회차 계산: 등록(4회 등) 마다, 그 시작일 이후의 출석·결석·보강을 순서대로 채워 넣음
+let CALC={n:{},pair:{}};
+function calc(){
+  const P={};const get=k=>P[k]||(P[k]={ls:[],regs:[]});
+  S.lessons.forEach(l=>{if(l.sid&&l.tid)get(l.sid+'|'+l.tid).ls.push(l);});
+  S.regs.forEach(r=>get(r.sid+'|'+r.tid).regs.push(r));
+  const n={},pair={};
+  for(const[k,p]of Object.entries(P)){
+    const cl=p.ls.filter(l=>COUNTED.has(l.status)).sort((a,b)=>(a.date+(a.time||'')).localeCompare(b.date+(b.time||'')));
+    const regs=p.regs.sort((a,b)=>a.start.localeCompare(b.start)||(a.at||0)-(b.at||0));
+    const used=new Set();let cur=null;
+    regs.forEach((r,ri)=>{
+      const total=+r.total||4;let c=Math.min(+r.done0||0,total);
+      for(const l of cl){if(c>=total)break;if(used.has(l.id)||l.date<r.start)continue;used.add(l.id);c++;n[l.id]={n:c,total,reg:r.id};}
+      r._used=c;r._total=total;r._idx=ri+1;cur=r;
+    });
+    let over=0;
+    cl.forEach(l=>{if(!used.has(l.id)&&cur&&l.date>=cur.start){n[l.id]={over:true};over++;}});
+    pair[k]=cur?{reg:cur,used:cur._used,total:cur._total,left:cur._total-cur._used,over,lastDate:cl.length?cl[cl.length-1].date:null}:{noReg:true,over:0,lastDate:cl.length?cl[cl.length-1].date:null};
+  }
+  CALC={n,pair};
+}
+const pairOf=(sid,tid)=>CALC.pair[sid+'|'+tid]||{noReg:true,over:0};
+function nextCountLabel(sid,tid){
+  const p=pairOf(sid,tid);
+  if(p.noReg)return `<span class="pill" style="background:#f3f4f6;color:#6b7280">회차 미설정</span>`;
+  if(p.left<=0)return `<span class="pill" style="background:var(--nob);color:var(--no)">재등록 필요</span>`;
+  return `<span class="pill" style="background:var(--acb);color:var(--ac)">${p.used+1}/${p.total}회차</span>`;
+}
+function countText(l){const c=CALC.n[l.id];if(!COUNTED.has(l.status))return '-';if(!c)return '·';if(c.over)return '<b style="color:var(--no)">초과</b>';return c.n+'회차';}
+function lastTitle(sid,tid,beforeDate){
+  const ls=S.lessons.filter(l=>l.sid===sid&&l.tid===tid&&l.title&&(!beforeDate||l.date<=beforeDate)).sort((a,b)=>(b.date+(b.time||'')).localeCompare(a.date+(a.time||'')));
+  return ls[0]?ls[0].title:'';
+}
+// 학생이 듣는 수업 (지금 기준 진행 중인 시간표)
+function activeSlotsOf(sid){const t=today();return S.slots.filter(s=>s.sid===sid&&(!s.to||s.to>=t));}
+function pairsActive(){
+  const m={};const t=today();
+  S.slots.forEach(s=>{if(!s.sid||(s.to&&s.to<t))return;const st=ST(s.sid);if(!st||st.off)return;m[s.sid+'|'+s.tid]={sid:s.sid,tid:s.tid,kind:s.kind||''};});
+  return Object.values(m);
+}
+function missingLessons(tid,days=14){
+  const out=[];const t=today();
+  const st=S.cfg.startDate||'';
+  for(let i=1;i<=days;i++){const d=addD(t,-i);if(st&&d<st)break;occ(d,tid).forEach(s=>{if(!s.sid)return;if(!lessonOf(s,d))out.push({slot:s,date:d});});}
+  return out;
+}
+
+/* ---------- 로그인 ---------- */
+function acctEmail(id){return id+'@'+FC.authDomain;}
+function renderLogin(msg){
+  $('#app').innerHTML=`<div class="login"><div class="box">
+    <div class="muted" style="font-weight:800;letter-spacing:1px;color:var(--ac)">JB MUSIC</div>
+    <h1>수업 관리</h1><div class="muted" style="margin-bottom:16px">원장님께 받은 아이디로 로그인해요</div>
+    <label class="l">아이디</label><input class="f" id="lg-id" autocapitalize="off" autocomplete="username" spellcheck="false">
+    <label class="l">비밀번호</label><input class="f" id="lg-pw" type="password" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()">
+    <div class="err" id="lg-err">${esc(msg||'')}</div>
+    <button class="btn" style="width:100%;padding:13px;margin-top:6px" id="lg-btn" onclick="doLogin()">로그인</button>
+    <div style="text-align:center;margin-top:14px"><a href="?demo" class="muted">체험 모드로 둘러보기</a></div>
+  </div></div>`;
+}
+async function resolveMe(user){
+  const snap=await db.collection('accounts').doc(user.uid).get();
+  if(!snap.exists)return null;
+  const a=snap.data();
+  const admin=a.role==='admin';
+  if(!admin&&!a.tid)return null;
+  return {uid:user.uid,name:a.name||a.loginId||'',admin,tid:a.tid||null,loginId:a.loginId};
+}
+function renderSetup(msg){
+  $('#app').innerHTML=`<div class="login"><div class="box">
+    <div class="muted" style="font-weight:800;letter-spacing:1px;color:var(--ac)">JB MUSIC · 처음 설정</div>
+    <h1>관리자 계정 만들기</h1><div class="muted" style="margin-bottom:12px">대표님이 쓰실 관리자 아이디를 만들어요. 이 화면은 처음 한 번만 나와요.</div>
+    <label class="l">이름</label><input class="f" id="su-name" value="원장님">
+    <label class="l">아이디 (영어 소문자·숫자)</label><input class="f" id="su-id" autocapitalize="off" spellcheck="false" placeholder="예: jbadmin">
+    <label class="l">비밀번호 (6자 이상)</label><input class="f" id="su-pw" type="password" autocomplete="new-password">
+    <label class="l">비밀번호 확인</label><input class="f" id="su-pw2" type="password" autocomplete="new-password">
+    <div class="err" id="su-err">${esc(msg||'')}</div>
+    <button class="btn" style="width:100%;padding:13px;margin-top:6px" id="su-btn" onclick="doSetup()">관리자 계정 만들기</button>
+  </div></div>`;
+}
+async function doSetup(){
+  const g=k=>($('#'+k).value||'').trim();const er=$('#su-err');
+  const name=g('su-name')||'원장님',id=g('su-id').toLowerCase(),pw=$('#su-pw').value,pw2=$('#su-pw2').value;
+  if(!/^[a-z0-9._-]{3,30}$/.test(id)){er.textContent='아이디는 영어 소문자·숫자 3자 이상';return;}
+  if(pw.length<6){er.textContent='비밀번호는 6자 이상';return;}
+  if(pw!==pw2){er.textContent='비밀번호가 서로 달라요';return;}
+  $('#su-btn').disabled=true;
+  try{
+    const c=await firebase.auth().createUserWithEmailAndPassword(acctEmail(id),pw);const uid=c.user.uid;
+    const b=db.batch();
+    b.set(db.collection('setup').doc('owner'),{uid,at:Date.now()});
+    b.set(db.collection('accounts').doc(uid),{uid,role:'admin',loginId:id,name,createdAt:Date.now()});
+    await b.commit();
+    ME={uid,name,admin:true,tid:null,loginId:id};await start();
+  }catch(e){er.textContent='만들기 실패: '+(e.code==='auth/email-already-in-use'?'이미 있는 아이디예요':e.message);$('#su-btn').disabled=false;}
+}
+async function doLogin(){
+  const id=($('#lg-id').value||'').trim().toLowerCase(),pw=$('#lg-pw').value||'';const er=$('#lg-err');
+  if(!id||!pw){er.textContent='아이디와 비밀번호를 입력해주세요';return;}
+  $('#lg-btn').disabled=true;er.textContent='';
+  try{
+    const c=await firebase.auth().signInWithEmailAndPassword(acctEmail(id),pw);
+    const me=await resolveMe(c.user);
+    if(!me){await firebase.auth().signOut();er.textContent='사용 권한이 없는 계정이에요. 원장님께 문의해주세요';$('#lg-btn').disabled=false;return;}
+    ME=me;await start();
+  }catch(e){
+    er.textContent=e&&e.code==='auth/too-many-requests'?'여러 번 틀려서 잠시 막혔어요. 잠시 후 다시 해주세요':e&&e.code==='auth/network-request-failed'?'인터넷 연결을 확인해주세요':'아이디 또는 비밀번호가 맞지 않아요';
+    $('#lg-btn').disabled=false;
+  }
+}
+async function logout(){if(DEMO){location.href=location.pathname;return;}try{await firebase.auth().signOut();}catch(e){}location.replace(location.pathname);}
+async function start(){
+  $('#app').innerHTML='<div class="empty" style="padding-top:40vh">불러오는 중…</div>';
+  try{await Store.load();}catch(e){
+    $('#app').innerHTML=`<div class="login"><div class="box"><h1>불러오기 실패</h1><p class="muted" style="margin:10px 0">${esc(e.message)}</p><p class="muted small">인터넷 연결을 확인하거나 잠시 후 다시 열어주세요.</p><button class="btn" style="margin-top:12px" onclick="logout()">로그아웃</button></div></div>`;return;}
+  if(!ME.admin&&ME.tid){V.ttMine=true;}else V.ttMine=false;
+  render();
+}
+function boot(){
+  if(DEMO){
+    Store.load().then(async()=>{
+      if(!S.teachers.length)await seedData(true);
+      const p=new URLSearchParams(location.search).get('as');
+      const t=p&&S.teachers.find(x=>x.name===p);
+      ME=t?{uid:'demo',name:t.name,admin:false,tid:t.id}:{uid:'demo',name:'원장님',admin:true,tid:null};
+      V.ttMine=!ME.admin;render();
+    });
+    return;
+  }
+  let first=true;
+  firebase.auth().onAuthStateChanged(async u=>{
+    if(!first)return;first=false;
+    if(!u){
+      try{const o=await db.collection('setup').doc('owner').get();if(!o.exists){renderSetup();return;}}catch(e){console.warn(e);}
+      renderLogin();return;}
+    try{const me=await resolveMe(u);if(me){ME=me;await start();return;}}catch(e){console.warn(e);}
+    renderLogin('지금 로그인된 계정은 사용 권한이 없어요. 다른 아이디로 로그인해주세요');
+    try{await firebase.auth().signOut();}catch(e){}
+  });
+}
+
+/* ---------- 화면 틀 ---------- */
+function tabsList(){const t=[['today','오늘 수업'],['tt','시간표'],['stu','학생·일지']];if(ME.admin)t.push(['dash','현황판']);t.push(['set',ME.admin?'설정':'내 정보']);return t;}
+function render(){
+  calc();
+  const roleTxt=ME.admin?'관리자':'선생님';
+  if(!$('#shell')){
+    $('#app').innerHTML=`<div id="shell"><div class="top"><div class="logo">JB MUSIC<small>수업 관리</small></div>${DEMO?'<span class="demo-tag">체험 모드</span>':''}<div class="me" id="me"></div></div>
+    <div class="tabs" id="tabs"></div><main id="main"></main></div>`;
+  }
+  $('#me').innerHTML=`${esc(ME.name)} · ${roleTxt}`;
+  $('#tabs').innerHTML=tabsList().map(([k,n])=>`<button class="${V.tab===k?'on':''}" onclick="go('${k}')">${n}</button>`).join('');
+  const m=$('#main');
+  ({today:viewToday,tt:viewTT,stu:viewStu,dash:viewDash,set:viewSet}[V.tab]||viewToday)(m);
+}
+function go(t){V.tab=t;if(t!=='stu')V.stuId=null;render();window.scrollTo(0,0);}
+function rerender(){const y=window.scrollY;render();window.scrollTo(0,y);}
+
+/* ============ 오늘 수업 ============ */
+function viewToday(m){
+  const d=V.date;const isToday=d===today();
+  const tids=ME.admin?activeTeachers().map(t=>t.id):[myTid()];
+  let h=`<div class="row" style="margin-bottom:12px"><div class="nav"><button class="ar" onclick="V.date=addD(V.date,-1);render()">‹</button><div class="lbl">${fmtDY(d)}${isToday?' <span class="pill st-출석">오늘</span>':''}</div><button class="ar" onclick="V.date=addD(V.date,1);render()">›</button></div>
+  ${isToday?'':'<button class="btn sm gray" onclick="V.date=today();render()">오늘로</button>'}<div class="sp"></div>
+  <button class="btn sm ghost" onclick="openExtra()">＋ 보강·추가 수업</button></div>`;
+  // 미기록 안내
+  const miss=[];tids.forEach(t=>miss.push(...missingLessons(t)));
+  if(miss.length){
+    h+=`<div class="banner"><b>기록 안 한 지난 수업 ${miss.length}개</b> (최근 2주)<div style="margin-top:6px;display:flex;flex-wrap:wrap;gap:4px">${miss.slice(0,30).map(x=>`<button class="chip" onclick="openLesson('${x.slot.id}','${x.date}')">${fmtD(x.date)} ${x.slot.time} ${esc(sName(x.slot.sid))}${ME.admin?' · '+esc(tName(x.slot.tid)):''}</button>`).join('')}${miss.length>30?'<span class="muted">…</span>':''}</div></div>`;
+  }
+  let any=false;
+  tids.forEach(tid=>{
+    if(!tid)return;
+    const os=occ(d,tid);const ex=extras(d,tid);
+    if(!os.length&&!ex.length)return;any=true;
+    const t=T(tid)||{};
+    const items=[...os.map(s=>({s,l:lessonOf(s,d),time:s.time})),...ex.map(l=>({s:null,l,time:l.time||''}))].sort((a,b)=>a.time.localeCompare(b.time));
+    const recorded=items.filter(x=>x.s&&x.s.sid?x.l:x.l).length;
+    const indiv=items.filter(x=>!(x.s&&!x.s.sid)).length;
+    h+=`<div class="card"><div class="tch-h"><span class="dot" style="background:${tColor(tid)}"></span><h3 style="margin:0">${esc(t.name||'')}T</h3><span class="muted">${esc(SUBJ[t.subj]||'')} · ${esc(t.room||'')}</span><div class="sp"></div><span class="muted small">기록 ${recorded}/${indiv}</span>
+    ${(ME.admin||tid===myTid())&&items.some(x=>x.s&&x.s.sid&&!x.l)?`<button class="btn sm gray" onclick="bulkOff('${tid}')">이날 휴강 처리</button>`:''}</div>`;
+    items.forEach(({s,l,time})=>{
+      if(s&&!s.sid){h+=`<div class="lrow"><div class="t">${esc(time)}<small>${esc(s.room||'')}</small></div><div class="who"><b>${esc(s.label||'단체수업')}</b><div class="sub">단체 수업${s.dur?' · ~'+endTime(s.time,s.dur):''}</div></div></div>`;return;}
+      const sid=s?s.sid:l.sid;const st=ST(sid)||{};const kind=s?s.kind:(l&&l.kind);
+      const past=d<today();const cls=l?'done':(past?'miss':'');
+      const sub=l?(l.title?'🎵 '+esc(l.title):'')+(l.memo?' · '+esc(l.memo):''):(lastTitle(sid,tid,d)?'지난 진도: '+esc(lastTitle(sid,tid,d)):'');
+      const click=s?`openLesson('${s.id}','${d}')`:`openLessonById('${l.id}')`;
+      h+=`<div class="lrow ${cls}" onclick="${click}" style="cursor:pointer"><div class="t">${esc(time)}<small>${esc((s&&s.room)||(l&&l.room)||'')}</small></div>
+      <div class="who"><b>${esc(st.name||'?')}</b> ${kindBadge(kind)} ${!s?'<span class="muted small">(추가)</span>':''}<div class="sub">${sub||'&nbsp;'}</div></div>
+      <div style="text-align:right">${l?stPill(l.status)+'<div class="muted small" style="margin-top:3px">'+countText(l)+'</div>':nextCountLabel(sid,tid)}</div></div>`;
+    });
+    h+=`</div>`;
+  });
+  if(!any)h+=`<div class="card empty">${ME.tid||ME.admin?'이 날은 수업이 없어요':'이 계정에 연결된 선생님 정보가 없어요'}</div>`;
+  m.innerHTML=h;
+}
+async function bulkOff(tid){
+  const d=V.date;const os=occ(d,tid).filter(s=>s.sid&&!lessonOf(s,d));
+  if(!os.length)return;
+  if(!confirm(`${fmtD(d)} ${tName(tid)}T 수업 ${os.length}개를 모두 '휴강'으로 기록할까요?`))return;
+  for(const s of os)await Store.put('lessons',{date:d,time:s.time,tid,sid:s.sid,slotId:s.id,room:s.room||'',kind:s.kind||'',title:'',status:'휴강',memo:''});
+  toast('✅ 휴강으로 기록했어요');rerender();
+}
+
+/* ---------- 수업 기록 모달 ---------- */
+let _L=null;
+function openLesson(slotId,date){
+  const s=S.slots.find(x=>x.id===slotId);if(!s)return;
+  const ex=lessonOf(s,date);
+  if(ex)return openLessonById(ex.id);
+  if(!ME.admin&&s.tid!==myTid()){toast('다른 선생님 수업은 볼 수만 있어요');return;}
+  _L={isNew:true,date,time:s.time,tid:s.tid,sid:s.sid,slotId:s.id,room:s.room||'',kind:s.kind||'',title:lastTitle(s.sid,s.tid,date),status:date<=today()?'출석':'',memo:''};
+  lessonModal();
+}
+function openLessonById(id){
+  const l=S.lessons.find(x=>x.id===id);if(!l)return;
+  _L={...l,isNew:false};lessonModal();
+}
+function myStudentsFor(tid){
+  const ids=new Set(S.slots.filter(s=>s.tid===tid&&s.sid).map(s=>s.sid));
+  S.lessons.forEach(l=>{if(l.tid===tid&&l.sid)ids.add(l.sid);});
+  return S.students.filter(s=>ids.has(s.id)&&!s.off).sort((a,b)=>a.name.localeCompare(b.name));
+}
+function openExtra(){
+  const tid=ME.admin?(V.stuTid||(activeTeachers()[0]||{}).id):myTid();
+  if(!tid){toast('먼저 설정에서 선생님을 등록해주세요');return;}
+  _L={isNew:true,extra:true,date:V.date,time:'',tid,sid:'',slotId:null,room:(T(tid)||{}).room||'',kind:'',title:'',status:'보강',memo:''};
+  lessonModal();
+}
+function lessonModal(){
+  const L=_L;const ro=!L.isNew&&!canEditLesson(L);
+  const stOpts=L.extra?myStudentsFor(L.tid):[];
+  let h=`<div class="mh"><h3>${L.extra?'보강·추가 수업':esc(sName(L.sid))+' 수업 기록'}</h3><button class="x" onclick="closeM()">×</button></div>
+  <div class="muted">${esc(tName(L.tid))}T · ${fmtDY(L.date)} ${esc(L.time||'')}${L.room?' · '+esc(L.room):''}</div>`;
+  if(L.extra){
+    h+=`${ME.admin?`<label class="l">선생님</label><select class="f" id="lm-tid" onchange="lmKeep();_L.tid=this.value;_L.sid='';_L.room=(T(this.value)||{}).room||'';lessonModal()">${activeTeachers().map(t=>`<option value="${t.id}" ${t.id===L.tid?'selected':''}>${esc(t.name)}T (${esc(SUBJ[t.subj]||'')})</option>`).join('')}</select>`:''}
+    <label class="l">학생</label><select class="f" id="lm-sid">${stOpts.length?'':'<option value="">이 선생님 학생이 없어요</option>'}${stOpts.map(s=>`<option value="${s.id}" ${s.id===L.sid?'selected':''}>${esc(s.name)}</option>`).join('')}</select>
+    <div class="grid2"><div><label class="l">날짜</label><input class="f" type="date" id="lm-date" value="${L.date}"></div><div><label class="l">시간</label><input class="f" type="time" step="300" id="lm-time" value="${esc(L.time||'')}"></div></div>
+    <label class="l">레슨룸</label><select class="f" id="lm-room">${roomOpts(L.room)}</select>`;
+  }else if(!L.isNew){
+    h+=`<div class="grid2"><div><label class="l">날짜</label><input class="f" type="date" id="lm-date" value="${L.date}" ${ro?'disabled':''}></div><div><label class="l">시간</label><input class="f" type="time" step="300" id="lm-time" value="${esc(L.time||'')}" ${ro?'disabled':''}></div></div>`;
+  }
+  h+=`<label class="l">출결</label><div class="stbtns">${STATUS.map(s=>`<button class="st-${s} ${L.status===s?'on':''}" style="${L.status===s?'':'background:#fff;color:var(--gy)'}" ${ro?'disabled':''} onclick="lmKeep();_L.status='${s}';lessonModal()">${s}</button>`).join('')}</div>
+  <div class="muted small" style="margin-top:5px">출석·결석·보강은 회차에 들어가고, 연장·휴강은 회차를 쓰지 않아요</div>
+  <label class="l">진도 (곡·내용)</label><input class="f" id="lm-title" value="${esc(L.title||'')}" placeholder="예: 아이브 - shine with me" list="lm-dl" ${ro?'disabled':''}>
+  <datalist id="lm-dl">${[...new Set(S.lessons.filter(l=>l.sid===L.sid&&l.title).map(l=>l.title))].slice(-12).map(t=>`<option value="${esc(t)}">`).join('')}</datalist>
+  <label class="l">메모·피드백 <span class="muted small">(선생님·원장님만 봐요)</span></label><textarea class="f" id="lm-memo" ${ro?'disabled':''}>${esc(L.memo||'')}</textarea>`;
+  if(!L.isNew&&L.sid&&L.tid){const c=CALC.n[L.id];h+=`<div class="muted small" style="margin-top:8px">${c&&c.n?`이 수업은 <b>${c.n}/${c.total}회차</b>예요`:''}${L.by?` · 기록: ${esc(L.by)}`:''}</div>`;}
+  h+=ro?`<div class="mfoot"><button class="btn gray" onclick="closeM()">닫기</button></div>`:`<div class="mfoot">${!L.isNew?'<button class="btn red" style="flex:0 0 auto" onclick="delLesson()">삭제</button>':''}<button class="btn gray" onclick="closeM()">취소</button><button class="btn" onclick="saveLesson()">저장</button></div>`;
+  openM(h);
+}
+function lmKeep(){const g=id=>{const e=$('#'+id);return e?e.value:undefined;};const L=_L;['date','time','title','memo','sid','room'].forEach(k=>{const v=g('lm-'+k);if(v!==undefined)L[k]=v;});}
+async function saveLesson(){
+  const L=_L;
+  const g=id=>{const e=$('#'+id);return e?e.value:undefined;};
+  if(L.extra){L.sid=g('lm-sid');L.room=g('lm-room');}
+  if(g('lm-date')!==undefined)L.date=g('lm-date');
+  if(g('lm-time')!==undefined)L.time=g('lm-time');
+  L.title=(g('lm-title')||'').trim();L.memo=(g('lm-memo')||'').trim();
+  if(!L.sid){toast('학생을 골라주세요');return;}
+  if(!L.date){toast('날짜를 넣어주세요');return;}
+  if(!L.status){toast('출결을 골라주세요');return;}
+  if(L.extra&&!L.kind){const sl=S.slots.find(s=>s.sid===L.sid&&s.tid===L.tid&&s.kind);L.kind=sl?sl.kind:'';}
+  const o={...L};delete o.isNew;delete o.extra;
+  try{await Store.put('lessons',o);closeM();toast('✅ 저장했어요');rerender();}catch(e){alert('저장 실패: '+e.message);}
+}
+async function delLesson(){if(!confirm('이 수업 기록을 지울까요?'))return;try{await Store.del('lessons',_L.id);closeM();toast('지웠어요');rerender();}catch(e){alert('실패: '+e.message);}}
+
+/* ============ 시간표 ============ */
+function weekDates(){return DAYS.map((d,i)=>addD(V.week,i));}
+function viewTT(m){
+  const wd=weekDates();
+  let h=`<div class="row" style="margin-bottom:12px"><div class="nav"><button class="ar" onclick="V.week=addD(V.week,-7);render()">‹</button><div class="lbl">${fmtD(wd[0])} ~ ${fmtD(wd[5])}</div><button class="ar" onclick="V.week=addD(V.week,7);render()">›</button></div>
+  ${V.week===monday(today())?'':'<button class="btn sm gray" onclick="V.week=monday(today());render()">이번 주</button>'}<div class="sp"></div>
+  <div class="seg"><button class="${V.ttMode==='teacher'?'on':''}" onclick="V.ttMode='teacher';render()">선생님별</button><button class="${V.ttMode==='room'?'on':''}" onclick="V.ttMode='room';render()">레슨룸별</button></div></div>`;
+  if(V.ttMode==='teacher'){
+    let ts=activeTeachers();
+    if(myTid()){h+=`<div class="row" style="margin-bottom:10px"><button class="chip ${V.ttMine?'on':''}" onclick="V.ttMine=true;render()">내 시간표</button><button class="chip ${!V.ttMine?'on':''}" onclick="V.ttMine=false;render()">전체 선생님</button></div>`;if(V.ttMine)ts=ts.filter(t=>t.id===myTid());}
+    if(ME.admin)h+=`<div class="muted small" style="margin-bottom:8px">빈칸을 누르면 수업을 추가하고, 수업을 누르면 기록하거나 시간을 바꿀 수 있어요</div>`;
+    if(!ts.length)h+=`<div class="card empty">등록된 선생님이 없어요${ME.admin?' — 설정에서 추가해주세요':''}</div>`;
+    ts.forEach(t=>h+=teacherGrid(t,wd));
+  }else{
+    h+=roomView(wd);
+  }
+  m.innerHTML=h;
+}
+function teacherGrid(t,wd){
+  const days=wd.slice(0,6);const sun=wd[6];
+  const hasSun=occ(sun,t.id).length||extras(sun,t.id).length;if(hasSun)days.push(sun);
+  const cellItems={};let minH=13,maxH=21;
+  days.forEach(d=>{
+    occ(d,t.id).forEach(s=>{const H=hr(s.time);minH=Math.min(minH,H);const dur=+s.dur||60;const span=Math.max(1,Math.ceil(((+s.time.split(':')[1]||0)+dur)/60));maxH=Math.max(maxH,H+span-1);
+      (cellItems[d+'|'+H]=cellItems[d+'|'+H]||[]).push({s,l:lessonOf(s,d)});
+      for(let k=1;k<span;k++)(cellItems[d+'|'+(H+k)]=cellItems[d+'|'+(H+k)]||[]).push({s,cont:true});});
+    extras(d,t.id).forEach(l=>{if(!l.time)return;const H=hr(l.time);minH=Math.min(minH,H);maxH=Math.max(maxH,H);(cellItems[d+'|'+H]=cellItems[d+'|'+H]||[]).push({l,x:true});});
+  });
+  const workDays=String(t.days||'');
+  let h=`<div class="card"><div class="tch-h"><span class="dot" style="background:${tColor(t.id)}"></span><h3 style="margin:0">${esc(SUBJ[t.subj]||'')} · ${esc(t.name)}T</h3><span class="muted">${esc(t.days||'')} ${t.room?'('+esc(t.room)+')':''}</span></div>
+  <div class="tt-wrap"><table class="tt"><thead><tr><th style="width:52px">시간</th>${days.map(d=>`<th class="${d===today()?'today':''}">${DOW[dow(d)]}<br><span style="font-weight:500">${pd(d).getMonth()+1}/${pd(d).getDate()}</span></th>`).join('')}</tr></thead><tbody>`;
+  for(let H=minH;H<=maxH;H++){
+    h+=`<tr><td class="h">${pad(H)}:00</td>`;
+    days.forEach(d=>{
+      const its=cellItems[d+'|'+H]||[];const off=workDays&&!workDays.includes(DOW[dow(d)])&&!its.length;
+      h+=`<td class="cell ${off?'off':''}" onclick="ttCell(event,'${t.id}','${d}',${H})">${its.map(it=>ttItem(it,d)).join('')}</td>`;
+    });
+    h+=`</tr>`;
+  }
+  h+=`</tbody></table></div></div>`;
+  return h;
+}
+function ttItem(it,d){
+  if(it.x){const l=it.l;return `<span class="it x" onclick="event.stopPropagation();openLessonById('${l.id}')"><span class="tm">${esc(l.time)} 추가</span>${esc(sName(l.sid))}<span class="s st-${l.status}">${l.status}</span></span>`;}
+  const s=it.s;
+  if(it.cont)return `<span class="it cont ${s.sid?'':'grp'}">↑ ${esc(s.sid?sName(s.sid):s.label||'단체')}</span>`;
+  const nm=s.sid?esc(sName(s.sid)):esc(s.label||'단체수업');
+  const tm=(s.time.endsWith(':00')?'':s.time)+(s.dur&&+s.dur!==60?(s.time.endsWith(':00')?s.time:'')+'~'+endTime(s.time,s.dur):'');
+  const room=s.room&&T(s.tid)&&s.room!==T(s.tid).room?' '+s.room:'';
+  return `<span class="it ${s.sid?'':'grp'}" style="border-left-color:${tColor(s.tid)}" onclick="event.stopPropagation();ttSlot('${s.id}','${d}')">${tm||room?`<span class="tm">${esc(tm)}${esc(room)}</span>`:''}${nm} ${kindBadge(s.kind)}${it.l?`<span class="s st-${it.l.status}">${it.l.status}</span>`:''}</span>`;
+}
+function ttCell(e,tid,d,H){
+  if(!ME.admin)return;
+  slotModal({tid,day:dow(d),time:pad(H)+':00',dur:60,room:(T(tid)||{}).room||'',kind:'',from:monday(d)});
+}
+function ttSlot(id,d){
+  const s=S.slots.find(x=>x.id===id);if(!s)return;
+  if(!s.sid){if(ME.admin)slotModal({...s},d);return;}
+  if(!ME.admin){openLesson(id,d);return;}
+  const l=lessonOf(s,d);
+  openM(`<div class="mh"><h3>${esc(sName(s.sid))} · ${DOW[s.day]} ${esc(s.time)}</h3><button class="x" onclick="closeM()">×</button></div>
+  <div class="muted">${esc(tName(s.tid))}T · ${esc(s.room||'')} · ${fmtDY(d)}</div>
+  <div style="display:grid;gap:8px;margin-top:14px">
+  <button class="btn" onclick="closeM();openLesson('${s.id}','${d}')">${l?'수업 기록 보기·수정':'이날 수업 기록하기'}</button>
+  <button class="btn ghost" onclick="closeM();slotModal(S.slots.find(x=>x.id==='${s.id}'),'${d}')">시간표 바꾸기 (요일·시간·레슨룸)</button>
+  <button class="btn gray" onclick="closeM();V.tab='stu';V.stuId='${s.sid}';render()">${esc(sName(s.sid))} 수업일지 보기</button></div>`);
+}
+function roomView(wd){
+  if(!V.ttDay||!wd.includes(V.ttDay))V.ttDay=wd.includes(today())?today():wd[0];
+  const d=V.ttDay;
+  let h=`<div class="row" style="margin-bottom:10px">${wd.map(x=>`<button class="chip ${x===d?'on':''}" onclick="V.ttDay='${x}';render()">${DOW[dow(x)]} ${pd(x).getDate()}</button>`).join('')}</div>`;
+  const os=occ(d);const ex=extras(d).filter(l=>l.time);
+  const rooms=[...S.cfg.rooms];[...os.map(s=>s.room),...ex.map(l=>l.room)].forEach(r=>{if(r&&!rooms.includes(r))rooms.push(r);});
+  const cell={};let minH=13,maxH=21;
+  os.forEach(s=>{const H=hr(s.time);const span=Math.max(1,Math.ceil(((+s.time.split(':')[1]||0)+(+s.dur||60))/60));minH=Math.min(minH,H);maxH=Math.max(maxH,H+span-1);
+    for(let k=0;k<span;k++)(cell[(s.room||'?')+'|'+(H+k)]=cell[(s.room||'?')+'|'+(H+k)]||[]).push({s,cont:k>0});});
+  ex.forEach(l=>{const H=hr(l.time);minH=Math.min(minH,H);maxH=Math.max(maxH,H);(cell[(l.room||'?')+'|'+H]=cell[(l.room||'?')+'|'+H]||[]).push({l});});
+  h+=`<div class="card"><div class="muted small" style="margin-bottom:8px">${fmtDY(d)} 레슨룸 사용 현황 · 빨간 테두리는 같은 방·같은 시간에 겹친 수업</div><div class="tt-wrap"><table class="tt" style="min-width:${80+rooms.length*86}px"><thead><tr><th style="width:52px">시간</th>${rooms.map(r=>`<th>${esc(r)}</th>`).join('')}</tr></thead><tbody>`;
+  for(let H=minH;H<=maxH;H++){
+    h+=`<tr><td class="h">${pad(H)}:00</td>`;
+    rooms.forEach(r=>{const its=cell[r+'|'+H]||[];const cf=its.length>1;
+      h+=`<td class="cell" style="cursor:default">${its.map(it=>{
+        if(it.l)return `<span class="it x ${cf?'conflict':''}" style="border-left-color:${tColor(it.l.tid)}" onclick="openLessonById('${it.l.id}')"><span class="tm">${esc(tName(it.l.tid))}T · ${esc(it.l.time)}</span>${esc(sName(it.l.sid))}</span>`;
+        const s=it.s;return `<span class="it ${s.sid?'':'grp'} ${it.cont?'cont':''} ${cf?'conflict':''}" style="border-left-color:${tColor(s.tid)}" onclick="ttSlot('${s.id}','${d}')"><span class="tm">${esc(tName(s.tid))}T${s.time.endsWith(':00')?'':' · '+esc(s.time)}</span>${esc(s.sid?sName(s.sid):s.label||'단체')}</span>`;}).join('')}</td>`;});
+    h+=`</tr>`;
+  }
+  h+=`</tbody></table></div></div>`;
+  return h;
+}
+
+/* ---------- 시간표 수업 추가·변경 (관리자) ---------- */
+let _SL=null,_SLdate=null;
+function roomOpts(sel){const rs=[...S.cfg.rooms];if(sel&&!rs.includes(sel))rs.push(sel);return `<option value="">-</option>`+rs.map(r=>`<option ${r===sel?'selected':''}>${esc(r)}</option>`).join('');}
+function slotModal(s,d){
+  _SL={...s};_SLdate=d||null;const isNew=!s.id;
+  const sts=S.students.filter(x=>!x.off).sort((a,b)=>a.name.localeCompare(b.name));
+  const grp=_SL.sid===null||(!isNew&&!_SL.sid);
+  openM(`<div class="mh"><h3>${isNew?'시간표에 수업 추가':'시간표 바꾸기'}</h3><button class="x" onclick="closeM()">×</button></div>
+  <div class="seg" style="margin:6px 0 4px"><button class="${grp?'':'on'}" onclick="_SL.sid=_SL.sid||'';slotModalRe(false)">1:1 레슨</button><button class="${grp?'on':''}" onclick="slotModalRe(true)">단체 수업</button></div>
+  <label class="l">선생님</label><select class="f" id="sm-tid">${activeTeachers().map(t=>`<option value="${t.id}" ${t.id===_SL.tid?'selected':''}>${esc(t.name)}T (${esc(SUBJ[t.subj]||'')})</option>`).join('')}</select>
+  ${grp?`<label class="l">수업 이름</label><input class="f" id="sm-label" value="${esc(_SL.label||'')}" placeholder="예: 단체보컬수업, 보컬디자인">`:
+  `<label class="l">학생</label><select class="f" id="sm-sid" onchange="document.getElementById('sm-new').classList.toggle('hide',this.value!=='__new')"><option value="">학생 선택</option><option value="__new">＋ 새 학생 등록</option>${sts.map(x=>`<option value="${x.id}" ${x.id===_SL.sid?'selected':''}>${esc(x.name)}</option>`).join('')}</select>
+  <input class="f hide" id="sm-new" placeholder="새 학생 이름" style="margin-top:6px">
+  <label class="l">구분</label><div id="sm-kind">${['',...Object.keys(KIND)].map(k=>`<button class="chip ${(_SL.kind||'')===k?'on':''}" onclick="_SL.kind='${k}';document.querySelectorAll('#sm-kind .chip').forEach(b=>b.classList.remove('on'));this.classList.add('on')">${k?KIND[k].t+' ('+(k==='KA'?'K.A':k)+')':'미정'}</button>`).join('')}</div>`}
+  <div class="grid2"><div><label class="l">요일</label><select class="f" id="sm-day">${DAYS.map(x=>`<option value="${x}" ${x===_SL.day?'selected':''}>${DOW[x]}요일</option>`).join('')}</select></div>
+  <div><label class="l">시작 시간</label><input class="f" type="time" step="300" id="sm-time" value="${esc(_SL.time||'')}"></div>
+  <div><label class="l">수업 길이</label><select class="f" id="sm-dur">${[30,40,50,60,90,120,150].map(x=>`<option value="${x}" ${+(_SL.dur||60)===x?'selected':''}>${x}분</option>`).join('')}</select></div>
+  <div><label class="l">레슨룸</label><select class="f" id="sm-room">${roomOpts(_SL.room)}</select></div></div>
+  <label class="l">${isNew?'언제부터':'바뀐 시간표를 언제부터 적용할까요'}</label><input class="f" type="date" id="sm-from" value="${isNew?(_SL.from||monday(today())):(d?monday(d):monday(today()))}">
+  ${!isNew?`<div class="muted small" style="margin-top:4px">이전 기록은 그대로 두고, 이 날짜부터 새 시간표로 바뀌어요</div>`:''}
+  <div class="mfoot">${!isNew?'<button class="btn red" style="flex:0 0 auto" onclick="endSlot()">수업 종료</button>':''}<button class="btn gray" onclick="closeM()">취소</button><button class="btn" onclick="saveSlot(${isNew})">저장</button></div>`);
+}
+function slotModalRe(grp){
+  const keep=k=>{const e=$('#'+k);return e?e.value:null;};
+  _SL.tid=keep('sm-tid')||_SL.tid;_SL.day=+(keep('sm-day')??_SL.day);_SL.time=keep('sm-time')||_SL.time;_SL.dur=+(keep('sm-dur')||_SL.dur);_SL.room=keep('sm-room')??_SL.room;
+  if(grp){_SL.sid=null;}else{if(_SL.sid===null)_SL.sid='';}
+  const id=_SL.id;const tmp={..._SL};if(!id)delete tmp.id;slotModal(tmp,_SLdate);if(id)_SL.id=id;
+}
+async function saveSlot(isNew){
+  const g=id=>{const e=$('#'+id);return e?e.value:null;};
+  const o={...(_SL||{})};
+  o.tid=g('sm-tid');o.day=+g('sm-day');o.time=g('sm-time');o.dur=+g('sm-dur');o.room=g('sm-room')||'';const from=g('sm-from');
+  if(!o.time){toast('시작 시간을 넣어주세요');return;}
+  if($('#sm-label')){o.sid=null;o.label=(g('sm-label')||'').trim()||'단체수업';o.kind='';}
+  else{
+    let sid=g('sm-sid');
+    if(sid==='__new'){const nm=(g('sm-new')||'').trim();if(!nm){toast('새 학생 이름을 넣어주세요');return;}
+      const dup=S.students.find(x=>x.name===nm&&!x.off);if(dup&&!confirm(`'${nm}' 학생이 이미 있어요. 같은 학생이면 [취소] 후 목록에서 골라주세요.\n동명이인이라 새로 만들까요?`))return;
+      const st=await Store.put('students',{name:nm,created:today()});sid=st.id;}
+    if(!sid){toast('학생을 골라주세요');return;}
+    o.sid=sid;delete o.label;
+  }
+  try{
+    if(isNew){o.from=from||monday(today());o.to='';delete o.id;await Store.put('slots',o);}
+    else{
+      const old=S.slots.find(x=>x.id===o.id);
+      const core=['tid','day','time','dur','room','sid'].some(k=>String(old[k]??'')!==String(o[k]??''));
+      const hasLessons=S.lessons.some(l=>l.slotId===old.id);
+      if(core&&hasLessons&&from&&from>(old.from||'')){
+        await Store.put('slots',{...old,to:addD(from,-1)});
+        const n={...o};delete n.id;n.from=from;n.to=old.to&&old.to>=from?old.to:'';await Store.put('slots',n);
+      }else{await Store.put('slots',o);}
+    }
+    closeM();toast('✅ 시간표를 저장했어요');rerender();
+  }catch(e){alert('저장 실패: '+e.message);}
+}
+async function endSlot(){
+  const o=_SL;const d=$('#sm-from').value||today();
+  const hasLessons=S.lessons.some(l=>l.slotId===o.id);
+  if(!hasLessons&&confirm('아직 기록이 없는 수업이에요. 시간표에서 아예 지울까요?\n([취소]를 누르면 날짜 기준으로 종료만 해요)')){await Store.del('slots',o.id);closeM();toast('지웠어요');rerender();return;}
+  if(!confirm(`${fmtD(d)}부터 이 수업을 시간표에서 뺄까요? (이전 기록은 남아요)`))return;
+  await Store.put('slots',{...S.slots.find(x=>x.id===o.id),to:addD(d,-1)});closeM();toast('✅ 종료했어요');rerender();
+}
+
+/* ============ 학생·수업일지 ============ */
+function viewStu(m){if(V.stuId)return viewStuDetail(m);
+  let list=S.students.filter(s=>V.showOff?s.off:!s.off);
+  const mine=!ME.admin&&myTid();
+  if(mine){const ids=new Set(myStudentsFor(myTid()).map(s=>s.id));list=list.filter(s=>ids.has(s.id));}
+  if(V.stuTid&&ME.admin){const ids=new Set(S.slots.filter(s=>s.tid===V.stuTid&&(!s.to||s.to>=today())).map(s=>s.sid));list=list.filter(s=>ids.has(s.id));}
+  if(V.stuKind){list=list.filter(s=>activeSlotsOf(s.id).some(x=>(x.kind||'')===(V.stuKind==='none'?'':V.stuKind)));}
+  if(V.stuQ)list=list.filter(s=>s.name.includes(V.stuQ));
+  list.sort((a,b)=>a.name.localeCompare(b.name));
+  let h=`<div class="row" style="margin-bottom:10px"><input class="f" style="flex:1;min-width:140px" placeholder="이름 검색" value="${esc(V.stuQ)}" oninput="V.stuQ=this.value;clearTimeout(window._sq);window._sq=setTimeout(()=>{render();const i=document.querySelector('main input');i.focus();i.setSelectionRange(99,99)},250)">
+  ${ME.admin?`<select class="f" style="width:auto" onchange="V.stuTid=this.value;render()"><option value="">전체 선생님</option>${activeTeachers().map(t=>`<option value="${t.id}" ${V.stuTid===t.id?'selected':''}>${esc(t.name)}T</option>`).join('')}</select>
+  <button class="btn sm" onclick="studentModal()">＋ 학생</button>`:''}</div>
+  <div class="row" style="margin-bottom:10px">${[['','전체'],...Object.entries(KIND).map(([k,v])=>[k,v.t]),['none','구분 미정']].map(([k,n])=>`<button class="chip ${V.stuKind===k?'on':''}" onclick="V.stuKind='${k}';render()">${n}</button>`).join('')}
+  ${ME.admin?`<div class="sp"></div><button class="chip ${V.showOff?'on':''}" onclick="V.showOff=!V.showOff;render()">퇴원생 보기</button>`:''}</div>`;
+  h+=`<div class="card">${list.length?'':'<div class="empty">학생이 없어요</div>'}`;
+  list.forEach(s=>{
+    const sl=activeSlotsOf(s.id);const tids=[...new Set(sl.map(x=>x.tid))];
+    const chips=tids.filter(t=>!mine||t===myTid()).map(tid=>{const p=pairOf(s.id,tid);const k=(sl.find(x=>x.tid===tid&&x.kind)||{}).kind;
+      const c=p.noReg?'<span class="muted small">회차 미설정</span>':p.left<=0?'<span class="pill" style="background:var(--nob);color:var(--no)">재등록</span>':`<span class="muted small">${p.used}/${p.total}</span>`;
+      return `<span style="white-space:nowrap;margin-right:10px">${kindBadge(k)} <b style="color:${tColor(tid)}">${esc(SUBJ[(T(tid)||{}).subj]||'')}</b> ${esc(tName(tid))}T ${c}</span>`;}).join('');
+    h+=`<div class="srow" onclick="V.stuId='${s.id}';render();window.scrollTo(0,0)"><div style="flex:1;min-width:0"><div class="nm">${esc(s.name)} </div><div class="small" style="margin-top:3px;line-height:1.8">${chips||'<span class="muted">진행 중인 수업 없음</span>'}</div></div><span class="muted">›</span></div>`;
+  });
+  h+=`</div><div class="muted small">${list.length}명</div>`;
+  m.innerHTML=h;
+}
+async function viewStuDetail(m){
+  const s=ST(V.stuId);if(!s){V.stuId=null;return viewStu(m);}
+  const mine=!ME.admin&&myTid();
+  const tids=[...new Set([...S.slots.filter(x=>x.sid===s.id).map(x=>x.tid),...S.lessons.filter(l=>l.sid===s.id).map(l=>l.tid),...S.regs.filter(r=>r.sid===s.id).map(r=>r.tid)])].filter(t=>!mine||t===myTid());
+  let h=`<div class="row" style="margin-bottom:10px"><button class="btn sm gray" onclick="V.stuId=null;render()">‹ 학생 목록</button></div>
+  <div class="card"><div class="row"><h2 style="margin:0">${esc(s.name)}</h2>${s.off?'<span class="pill st-휴강">퇴원</span>':''}<div class="sp"></div>${ME.admin?`<button class="btn sm ghost" onclick="studentModal('${s.id}')">정보 수정</button>`:''}</div>
+  <div class="muted" style="margin-top:6px;line-height:1.7">${[s.birth&&'생년월일 '+esc(s.birth),s.school&&esc(s.school),s.phone&&'학생 '+esc(s.phone),s.parent&&'학부모 '+esc(s.parent)].filter(Boolean).join(' · ')||'기본 정보 없음'}${s.memo?`<br>📝 ${esc(s.memo)}`:''}</div></div>`;
+  if(!tids.length)h+=`<div class="card empty">아직 수업이 없어요</div>`;
+  tids.forEach(tid=>{
+    const t=T(tid)||{};const p=pairOf(s.id,tid);
+    const sl=S.slots.filter(x=>x.sid===s.id&&x.tid===tid&&(!x.to||x.to>=today()));
+    const ls=S.lessons.filter(l=>l.sid===s.id&&l.tid===tid).sort((a,b)=>(b.date+(b.time||'')).localeCompare(a.date+(a.time||'')));
+    const regs=S.regs.filter(r=>r.sid===s.id&&r.tid===tid).sort((a,b)=>b.start.localeCompare(a.start));
+    const regTxt=p.noReg?`<span class="pill" style="background:#f3f4f6;color:#6b7280">회차 미설정</span>`:p.left<=0?`<span class="pill" style="background:var(--nob);color:var(--no)">${p.used}/${p.total} · 재등록 필요${p.over?' (등록 없이 '+p.over+'회 진행)':''}</span>`:`<span class="pill" style="background:var(--acb);color:var(--ac)">${p.used}/${p.total}회차 진행 · ${p.left}회 남음</span>`;
+    h+=`<div class="card"><div class="tch-h"><span class="dot" style="background:${tColor(tid)}"></span><h3 style="margin:0">${esc(SUBJ[t.subj]||'')} · ${esc(t.name||'')}T</h3>${kindBadge((sl.find(x=>x.kind)||{}).kind)}<div class="sp"></div>${regTxt}</div>
+    <div class="row muted small" style="margin-bottom:8px">${sl.length?sl.map(x=>`${DOW[x.day]} ${esc(x.time)}${x.dur&&+x.dur!==60?'~'+endTime(x.time,x.dur):''} ${esc(x.room||'')}`).join(' / '):'진행 중인 시간표 없음'}
+    <div class="sp"></div>${ME.admin?`<button class="btn sm" onclick="regModal('${s.id}','${tid}')">${p.noReg?'회차 설정':'재등록'}</button>`:''}${ME.admin||tid===myTid()?`<button class="btn sm ghost" onclick="_L={isNew:true,extra:true,date:today(),time:'',tid:'${tid}',sid:'${s.id}',slotId:null,room:(T('${tid}')||{}).room||'',kind:'',title:lastTitle('${s.id}','${tid}'),status:'보강',memo:''};lessonModal()">＋ 기록</button>`:''}</div>
+    ${regs.length?`<div class="muted small" style="margin-bottom:6px">등록: ${regs.slice(0,4).map(r=>`<span ${ME.admin?`style="text-decoration:underline;cursor:pointer" onclick="regModal('${s.id}','${tid}','${r.id}')"`:''}>${fmtD(r.start)}부터 ${r.total}회${r.done0?' (시작 '+r.done0+'회 진행)':''}</span>`).join(' · ')}</div>`:''}
+    <table class="log"><thead><tr><th style="width:84px">날짜</th><th>진도</th><th style="width:56px">회차</th><th style="width:56px">출결</th></tr></thead><tbody>
+    ${ls.length?ls.map(l=>`<tr onclick="openLessonById('${l.id}')"><td>${fmtD(l.date)}${l.slotId?'':'<br><span class="muted small">추가</span>'}</td><td>${esc(l.title||'')}${l.memo?`<div class="muted small">${esc(l.memo)}</div>`:''}</td><td class="small">${countText(l)}</td><td>${stPill(l.status)}</td></tr>`).join(''):'<tr><td colspan="4" class="muted" style="text-align:center;padding:16px">기록이 없어요</td></tr>'}
+    </tbody></table></div>`;
+  });
+  if(!DEMO&&!S.olderLoaded[s.id])h+=`<div style="text-align:center"><button class="btn sm gray" onclick="Store.loadStudentAll('${s.id}').then(rerender)">${LESSON_WINDOW_DAYS}일보다 이전 기록 더 보기</button></div>`;
+  m.innerHTML=h;
+}
+async function studentModal(id){
+  const s=id?{...ST(id)}:{name:'',created:today()};
+  openM(`<div class="mh"><h3>${id?'학생 정보 수정':'새 학생 등록'}</h3><button class="x" onclick="closeM()">×</button></div>
+  <label class="l">이름</label><input class="f" id="st-name" value="${esc(s.name)}">
+  <div class="grid2"><div><label class="l">생년월일</label><input class="f" id="st-birth" value="${esc(s.birth||'')}" placeholder="2010-03-08"></div><div><label class="l">학교/학년</label><input class="f" id="st-school" value="${esc(s.school||'')}" placeholder="상동중 2"></div>
+  <div><label class="l">학생 연락처</label><input class="f" id="st-phone" value="${esc(s.phone||'')}" inputmode="tel"></div><div><label class="l">학부모 연락처</label><input class="f" id="st-parent" value="${esc(s.parent||'')}" inputmode="tel"></div></div>
+  <label class="l">메모</label><textarea class="f" id="st-memo">${esc(s.memo||'')}</textarea>
+  <div class="mfoot">${id?`<button class="btn ${s.off?'ghost':'red'}" style="flex:0 0 auto" onclick="toggleOff('${id}')">${s.off?'재원으로 되돌리기':'퇴원 처리'}</button>`:''}<button class="btn gray" onclick="closeM()">취소</button><button class="btn" onclick="saveStudent('${id||''}')">저장</button></div>`);
+}
+async function saveStudent(id){
+  const g=k=>($('#'+k).value||'').trim();
+  const nm=g('st-name');if(!nm){toast('이름을 넣어주세요');return;}
+  const s=id?{...ST(id)}:{created:today()};
+  Object.assign(s,{name:nm,birth:g('st-birth'),school:g('st-school'),phone:g('st-phone'),parent:g('st-parent'),memo:g('st-memo')});
+  try{await Store.put('students',s);closeM();toast('✅ 저장했어요');rerender();}catch(e){alert('저장 실패: '+e.message);}
+}
+async function toggleOff(id){
+  const s={...ST(id)};
+  if(!s.off){
+    const d=prompt('퇴원 날짜 (이 날짜부터 시간표에서 빠져요)',today());if(!d)return;
+    s.off=true;s.offDate=d;await Store.put('students',s);
+    for(const sl of S.slots.filter(x=>x.sid===id&&(!x.to||x.to>=d)))await Store.put('slots',{...sl,to:addD(d,-1)});
+  }else{s.off=false;s.offDate='';await Store.put('students',s);toast('시간표는 다시 추가해주세요');}
+  closeM();rerender();
+}
+function regModal(sid,tid,regId){
+  const r=regId?S.regs.find(x=>x.id===regId):null;
+  const p=pairOf(sid,tid);
+  // 새 등록 시작일: 이전 등록이 다 찬 뒤 처음 진행한 수업 날짜, 없으면 오늘
+  let start=today();
+  if(!r&&p.reg){const firstOver=S.lessons.filter(l=>l.sid===sid&&l.tid===tid&&CALC.n[l.id]&&CALC.n[l.id].over).sort((a,b)=>a.date.localeCompare(b.date))[0];start=firstOver?firstOver.date:addD(p.lastDate||today(),1);if(start>today()&&!firstOver)start=today();}
+  const first=!r&&p.noReg;
+  openM(`<div class="mh"><h3>${r?'등록 정보 수정':first?'회차 설정':'재등록'}</h3><button class="x" onclick="closeM()">×</button></div>
+  <div class="muted">${esc(sName(sid))} · ${esc(tName(tid))}T</div>
+  ${first?'<div class="banner info" style="margin-top:10px">지금 몇 회차까지 했는지 넣어주시면, 다음 수업부터 회차가 자동으로 이어져요</div>':''}
+  <div class="grid2"><div><label class="l">시작일</label><input class="f" type="date" id="rg-start" value="${r?r.start:start}"></div>
+  <div><label class="l">이번 등록 총 회차</label><select class="f" id="rg-total">${[4,8,12,1,2,3,5,6,10].map(n=>`<option value="${n}" ${(r?+r.total:4)===n?'selected':''}>${n}회</option>`).join('')}</select></div></div>
+  ${first||(r&&r.done0)?`<label class="l">시작일 전에 이미 한 회차</label><select class="f" id="rg-done0">${[0,1,2,3,4,5,6,7].map(n=>`<option value="${n}" ${(r?+(r.done0||0):0)===n?'selected':''}>${n}회 (다음 수업이 ${n+1}회차)</option>`).join('')}</select>`:''}
+  <label class="l">메모</label><input class="f" id="rg-memo" value="${esc(r?r.memo||'':'')}" placeholder="예: 11월 결제">
+  <div class="mfoot">${r?'<button class="btn red" style="flex:0 0 auto" onclick="delReg(\''+r.id+'\')">삭제</button>':''}<button class="btn gray" onclick="closeM()">취소</button><button class="btn" onclick="saveReg('${sid}','${tid}','${r?r.id:''}')">저장</button></div>`);
+}
+async function saveReg(sid,tid,id){
+  const o=id?{...S.regs.find(x=>x.id===id)}:{sid,tid};
+  o.start=$('#rg-start').value||today();o.total=+$('#rg-total').value;o.done0=$('#rg-done0')?+$('#rg-done0').value:0;o.memo=($('#rg-memo').value||'').trim();
+  try{await Store.put('regs',o);closeM();toast('✅ 저장했어요');rerender();}catch(e){alert('저장 실패: '+e.message);}
+}
+async function delReg(id){if(!confirm('이 등록 정보를 지울까요? 회차가 다시 계산돼요'))return;await Store.del('regs',id);closeM();rerender();}
+
+/* ============ 현황판 (관리자) ============ */
+function viewDash(m){
+  const t0=today();const wk=monday(t0);const wd=DAYS.map((d,i)=>addD(wk,i));
+  const ym=t0.slice(0,7);
+  const pairs=pairsActive();
+  const activeStu=new Set(pairs.map(p=>p.sid));
+  let wkTotal=0,wkDone=0,wkPast=0;
+  wd.forEach(d=>occ(d).forEach(s=>{if(!s.sid)return;wkTotal++;if(d<=t0){wkPast++;if(lessonOf(s,d))wkDone++;}}));
+  const renew=[],soon=[],noReg=[];
+  pairs.forEach(p=>{const c=pairOf(p.sid,p.tid);if(c.noReg)noReg.push(p);else if(c.left<=0)renew.push({...p,c});else if(c.left===1)soon.push({...p,c});});
+  const miss=activeTeachers().map(t=>({t,n:missingLessons(t.id).length})).filter(x=>x.n);
+  let h=`<div class="kpis">
+  <div class="kpi"><div class="n">재원생</div><div class="v">${activeStu.size}<span class="muted" style="font-size:14px"> 명</span></div><div class="muted small">수강 ${pairs.length}건</div></div>
+  <div class="kpi"><div class="n">이번 주 수업</div><div class="v">${wkTotal}</div><div class="muted small">1:1 레슨 기준</div></div>
+  <div class="kpi"><div class="n">이번 주 기록률</div><div class="v">${wkPast?Math.round(wkDone/wkPast*100):0}<span class="muted" style="font-size:14px">%</span></div><div class="muted small">지난 수업 ${wkPast}개 중 ${wkDone}개</div></div>
+  <div class="kpi"><div class="n">재등록 필요</div><div class="v" style="color:${renew.length?'var(--no)':'inherit'}">${renew.length}</div><div class="muted small">다음이 마지막 ${soon.length}건</div></div></div>`;
+  const pairRow=(p,extra)=>`<tr style="cursor:pointer" onclick="V.tab='stu';V.stuId='${p.sid}';render()"><td><b>${esc(sName(p.sid))}</b> ${kindBadge(p.kind)}</td><td>${esc(tName(p.tid))}T</td><td>${extra}</td></tr>`;
+  h+=`<div class="cols2"><div class="card"><h3>🔔 재등록 필요 <span class="muted">${renew.length}</span></h3>${renew.length?`<table class="dt"><tbody>${renew.map(p=>pairRow(p,`${p.c.used}/${p.c.total}${p.c.over?` <span style="color:var(--no)">+${p.c.over}회 초과</span>`:''} <button class="btn sm" onclick="event.stopPropagation();regModal('${p.sid}','${p.tid}')">재등록</button>`)).join('')}</tbody></table>`:'<div class="muted">없어요</div>'}
+  ${soon.length?`<h3 style="margin-top:14px">다음 수업이 마지막 회차 <span class="muted">${soon.length}</span></h3><table class="dt"><tbody>${soon.map(p=>pairRow(p,`${p.c.used}/${p.c.total}`)).join('')}</tbody></table>`:''}</div>
+  <div class="card"><h3>✍️ 기록 안 한 지난 수업 (최근 2주)</h3>${miss.length?`<table class="dt"><tbody>${miss.map(x=>`<tr><td><span class="dot" style="background:${tColor(x.t.id)}"></span> ${esc(x.t.name)}T</td><td class="num"><b>${x.n}</b>개</td></tr>`).join('')}</tbody></table>`:'<div class="muted">모두 기록했어요 👍</div>'}
+  ${noReg.length?`<h3 style="margin-top:14px">회차 설정이 필요한 수강 <span class="muted">${noReg.length}</span></h3><div class="muted small" style="margin-bottom:6px">누르면 지금 몇 회차인지 넣을 수 있어요</div><div>${noReg.map(p=>`<button class="chip" onclick="regModal('${p.sid}','${p.tid}')">${esc(sName(p.sid))} · ${esc(tName(p.tid))}T</button>`).join('')}</div>`:''}</div></div>`;
+  // 선생님별 이번 달
+  const rows=activeTeachers().map(t=>{
+    const ls=S.lessons.filter(l=>l.tid===t.id&&l.date.startsWith(ym));const c={};STATUS.forEach(s=>c[s]=ls.filter(l=>l.status===s).length);
+    const stu=new Set(pairs.filter(p=>p.tid===t.id).map(p=>p.sid)).size;
+    let wk=0;wd.forEach(d=>occ(d,t.id).forEach(s=>{if(s.sid)wk++;}));
+    return {t,c,stu,wk,tot:ls.length};
+  });
+  h+=`<div class="card"><h3>선생님별 현황 <span class="muted">(${+ym.slice(5)}월 기록 기준)</span></h3><div class="tt-wrap"><table class="dt"><thead><tr><th>선생님</th><th class="num">학생</th><th class="num">이번 주 수업</th>${STATUS.map(s=>`<th class="num">${s}</th>`).join('')}</tr></thead><tbody>
+  ${rows.map(r=>`<tr><td><span class="dot" style="background:${tColor(r.t.id)}"></span> <b>${esc(r.t.name)}T</b> <span class="muted small">${esc(SUBJ[r.t.subj]||'')}</span></td><td class="num">${r.stu}</td><td class="num">${r.wk}</td>${STATUS.map(s=>`<td class="num" style="${r.c[s]&&(s==='결석'||s==='휴강')?'color:var(--no);font-weight:700':''}">${r.c[s]||'-'}</td>`).join('')}</tr>`).join('')}
+  </tbody></table></div></div>`;
+  // 구분·과목별
+  const byKind={};pairs.forEach(p=>{const k=p.kind||'none';byKind[k]=(byKind[k]||0)+1;});
+  const bySubj={};pairs.forEach(p=>{const s=(T(p.tid)||{}).subj||'?';bySubj[s]=(bySubj[s]||0)+1;});
+  h+=`<div class="cols2"><div class="card"><h3>구분별 수강</h3><table class="dt"><tbody>${[...Object.keys(KIND),'none'].filter(k=>byKind[k]).map(k=>`<tr><td>${k==='none'?'<span class="muted">구분 미정</span>':kindBadge(k)+' '+KIND[k].t}</td><td class="num"><b>${byKind[k]}</b>건</td></tr>`).join('')||'<tr><td class="muted">없음</td></tr>'}</tbody></table>${byKind.none?`<div class="muted small" style="margin-top:6px">구분 미정은 시간표에서 수업을 눌러 [시간표 바꾸기]에서 정할 수 있어요</div>`:''}</div>
+  <div class="card"><h3>과목별 수강</h3><table class="dt"><tbody>${Object.entries(bySubj).map(([k,n])=>`<tr><td>${esc(SUBJ[k]||k)}</td><td class="num"><b>${n}</b>건</td></tr>`).join('')||'<tr><td class="muted">없음</td></tr>'}</tbody></table></div></div>`;
+  m.innerHTML=h;
+}
+
+/* ============ 설정 ============ */
+function viewSet(m){
+  let h='';
+  if(!ME.admin){
+    const t=T(myTid())||{};
+    h+=`<div class="card"><h3>내 정보</h3><div class="muted">${esc(ME.name)} · ${esc(SUBJ[t.subj]||'')} · 기본 레슨룸 ${esc(t.room||'-')}</div><div class="muted small" style="margin-top:6px">아이디: ${esc(ME.loginId||'')}</div></div>
+    <div class="row"><button class="btn ghost" onclick="pwModal()">비밀번호 바꾸기</button><button class="btn gray" onclick="logout()">로그아웃</button></div>`;
+    m.innerHTML=h;return;
+  }
+  if(!S.teachers.length){
+    h+=`<div class="card"><h3>처음 시작하기</h3><div class="muted" style="margin-bottom:10px">구글 '뮤직 수업 일정표'의 <b>11월(9~14일)</b> 탭에 있는 선생님 8명, 학생, 주간 시간표를 한 번에 넣어요. 지난 탭에 적힌 구분(A/K.A/H/E)도 같이 넣어요. 넣은 뒤에 얼마든지 고칠 수 있어요.</div><button class="btn" onclick="seedData()">이번 주 일정표로 시작하기</button></div>`;
+  }
+  h+=`<div class="card"><div class="row" style="margin-bottom:6px"><h3 style="margin:0">선생님</h3><div class="sp"></div><button class="btn sm" onclick="teacherModal()">＋ 선생님</button></div>
+  <table class="dt"><thead><tr><th>이름</th><th>과목</th><th>요일·레슨룸</th><th>로그인 계정</th></tr></thead><tbody>
+  ${S.teachers.sort((a,b)=>(a.off?1:0)-(b.off?1:0)||(a.order??99)-(b.order??99)).map(t=>`<tr style="cursor:pointer;${t.off?'opacity:.5':''}" onclick="teacherModal('${t.id}')"><td><span class="dot" style="background:${tColor(t.id)}"></span> <b>${esc(t.name)}T</b>${t.off?' (퇴사)':''}</td><td>${esc(SUBJ[t.subj]||'')}</td><td>${esc(t.days||'')} ${esc(t.room||'')}</td><td>${t.loginId?`<span class="pill st-출석">${esc(t.loginId)}</span>`:'<span class="pill st-none">계정 없음</span>'}</td></tr>`).join('')}
+  </tbody></table><div class="muted small" style="margin-top:8px">선생님을 누르면 정보 수정·로그인 계정 만들기를 할 수 있어요. 선생님이 비밀번호를 잊으면 계정을 없앤 뒤 새로 만들어 주세요.</div></div>
+  <div class="card"><div class="row" style="margin-bottom:6px"><h3 style="margin:0">관리자 계정</h3><div class="sp"></div><button class="btn sm" onclick="adminModal()">＋ 관리자</button></div><div id="adm-list"><div class="muted">불러오는 중…</div></div></div>`;
+  h+=`<div class="card"><h3>레슨룸</h3><div class="muted small" style="margin-bottom:6px">쉼표로 구분해서 적어주세요</div><div class="row"><input class="f" style="flex:1" id="cfg-rooms" value="${esc(S.cfg.rooms.join(', '))}"><button class="btn sm" onclick="S.cfg.rooms=$('#cfg-rooms').value.split(',').map(x=>x.trim()).filter(Boolean);Store.saveCfg().then(()=>toast('✅ 저장했어요'))">저장</button></div></div>`;
+  h+=`<div class="card"><h3>회차 규칙</h3><div class="muted" style="line-height:1.7">· 출석·결석(당일결석)·보강 → 회차에 들어가요<br>· 연장·휴강 → 회차를 쓰지 않아요<br>· 등록한 회차(보통 4회)를 다 쓰면 '재등록 필요'로 표시돼요<br>· 재등록 전에 한 수업은 '초과'로 표시되고, 재등록하면 새 등록의 1회차부터 다시 세요</div></div>`;
+  h+=`<div class="row">${DEMO?'<button class="btn gray" onclick="if(confirm(\'체험 데이터를 처음 상태로 되돌릴까요?\')){localStorage.removeItem(LS_KEY);location.reload()}">체험 데이터 초기화</button>':''}<button class="btn ghost" onclick="pwModal()">비밀번호 바꾸기</button><button class="btn gray" onclick="logout()">${DEMO?'체험 모드 나가기':'로그아웃'}</button></div>`;
+  m.innerHTML=h;
+  adminListHtml().then(x=>{const e=$('#adm-list');if(e)e.innerHTML=x;});
+}
+function teacherModal(id){
+  const t=id?{...T(id)}:{name:'',subj:'V',room:'',days:'',color:TCOLORS[S.teachers.length%TCOLORS.length],order:S.teachers.length};
+  openM(`<div class="mh"><h3>${id?'선생님 정보':'새 선생님'}</h3><button class="x" onclick="closeM()">×</button></div>
+  <div class="grid2"><div><label class="l">이름</label><input class="f" id="tm-name" value="${esc(t.name)}" placeholder="김선우"></div>
+  <div><label class="l">과목</label><select class="f" id="tm-subj">${Object.entries(SUBJ).map(([k,v])=>`<option value="${k}" ${t.subj===k?'selected':''}>${v}</option>`).join('')}</select></div>
+  <div><label class="l">수업 요일</label><input class="f" id="tm-days" value="${esc(t.days||'')}" placeholder="월,수,목"></div>
+  <div><label class="l">기본 레슨룸</label><select class="f" id="tm-room">${roomOpts(t.room)}</select></div>
+  <div><label class="l">색</label><input class="f" type="color" id="tm-color" value="${t.color||'#1F6F78'}" style="height:44px;padding:4px"></div>
+  <div><label class="l">보이는 순서</label><input class="f" type="number" id="tm-order" value="${t.order??''}"></div></div>
+  ${id?`<label class="l">로그인 계정</label><div class="row">${t.loginId?`<span class="pill st-출석">${esc(t.loginId)}</span><button class="btn sm gray" onclick="unlinkAcct('${id}')">계정 없애기</button>`:'<span class="muted">아직 없음</span>'}<div class="sp"></div><button class="btn sm ghost" onclick="acctModal('${id}')">${t.loginId?'새 아이디로 다시 만들기':'계정 만들기'}</button></div>`:'<div class="muted small" style="margin-top:8px">저장한 뒤 로그인 계정을 만들 수 있어요</div>'}
+  <div class="mfoot">${id?`<button class="btn ${t.off?'ghost':'red'}" style="flex:0 0 auto" onclick="toggleTeacherOff('${id}')">${t.off?'복귀':'퇴사 처리'}</button>`:''}<button class="btn gray" onclick="closeM()">취소</button><button class="btn" onclick="saveTeacher('${id||''}')">저장</button></div>`);
+}
+async function saveTeacher(id){
+  const g=k=>($('#'+k).value||'').trim();
+  const t=id?{...T(id)}:{};
+  Object.assign(t,{name:g('tm-name').replace(/(T|쌤|선생님)$/,''),subj:g('tm-subj'),days:g('tm-days'),room:g('tm-room'),color:g('tm-color'),order:g('tm-order')===''?99:+g('tm-order')});
+  if(!t.name){toast('이름을 넣어주세요');return;}
+  try{await Store.put('teachers',t);closeM();toast('✅ 저장했어요');rerender();}catch(e){alert('저장 실패: '+e.message);}
+}
+async function toggleTeacherOff(id){
+  const t={...T(id)};
+  if(!t.off){if(!confirm(`${t.name}T를 퇴사 처리할까요?\n오늘부터 시간표에서 빠지고, 로그인 계정도 없어져요. 지난 수업 기록은 남아요.`))return;
+    t.off=true;for(const sl of S.slots.filter(x=>x.tid===id&&(!x.to||x.to>=today())))await Store.put('slots',{...sl,to:addD(today(),-1)});
+    if(t.uid)await unlinkAcct(id,true);Object.assign(t,{uid:'',loginId:''});
+  }else t.off=false;
+  await Store.put('teachers',{...T(id),...t});closeM();rerender();
+}
+let _accts=null;
+async function loadAccts(){
+  if(DEMO)return DEMO_ACCTS;
+  const q=await db.collection('accounts').get();const a=[];q.forEach(d=>a.push({...d.data(),uid:d.id}));return a;
+}
+let _acctApp=null;
+async function makeAuthUser(id,pw){
+  if(DEMO)return 'd'+rid();
+  if(!_acctApp)_acctApp=firebase.initializeApp(FC,'acct');
+  const a=_acctApp.auth();const c=await a.createUserWithEmailAndPassword(acctEmail(id),pw);const uid=c.user.uid;await a.signOut();return uid;
+}
+async function saveAcct(rec){if(DEMO){DEMO_ACCTS=DEMO_ACCTS.filter(x=>x.uid!==rec.uid);DEMO_ACCTS.push(rec);demoSave();return;}await db.collection('accounts').doc(rec.uid).set(rec);}
+async function delAcct(uid){if(DEMO){DEMO_ACCTS=DEMO_ACCTS.filter(x=>x.uid!==uid);demoSave();return;}await db.collection('accounts').doc(uid).delete();}
+function acctForm(pfx,ph){return `<div class="grid2"><div><label class="l">아이디 (영어 소문자·숫자)</label><input class="f" id="${pfx}-id" autocapitalize="off" spellcheck="false" placeholder="${ph}"></div><div><label class="l">처음 비밀번호 (6자 이상)</label><input class="f" id="${pfx}-pw" placeholder="예: 생년월일 6자리"></div></div>`;}
+function readAcctForm(pfx){
+  const id=($('#'+pfx+'-id').value||'').trim().toLowerCase(),pw=$('#'+pfx+'-pw').value||'';
+  if(!/^[a-z0-9._-]{3,30}$/.test(id)){toast('아이디는 영어 소문자·숫자 3자 이상');return null;}
+  if(pw.length<6){toast('비밀번호는 6자 이상');return null;}
+  if((_accts||[]).some(a=>a.loginId===id)){toast('이미 쓰고 있는 아이디예요');return null;}
+  return {id,pw};
+}
+async function acctModal(tid){
+  const t=T(tid);
+  try{_accts=await loadAccts();}catch(e){alert('계정 목록을 불러오지 못했어요: '+e.message);return;}
+  openM(`<div class="mh"><h3>${esc(t.name)}T 로그인 계정 만들기</h3><button class="x" onclick="closeM()">×</button></div>
+  <div class="muted small" style="margin:4px 0 6px">오디션앱도 쓰는 선생님은 오디션앱과 같은 아이디·비밀번호로 만들어 주면 헷갈리지 않아요</div>
+  ${acctForm('ac','예: kimsunwoo0101')}
+  <div class="mfoot"><button class="btn gray" onclick="closeM()">닫기</button><button class="btn" onclick="createAcct('${tid}')">계정 만들기</button></div>`);
+}
+async function createAcct(tid){
+  const f=readAcctForm('ac');if(!f)return;const t=T(tid);
+  try{
+    const uid=await makeAuthUser(f.id,f.pw);
+    await saveAcct({uid,role:'teacher',loginId:f.id,name:t.name,tid,createdAt:Date.now()});
+    if(t.uid)await unlinkAcct(tid,true);
+    await Store.put('teachers',{...T(tid),uid,loginId:f.id});
+    closeM();alert(`✅ 계정을 만들었어요\n\n아이디: ${f.id}\n비밀번호: ${f.pw}\n\n${t.name}T께 전달해주세요`);rerender();
+  }catch(e){alert('만들기 실패: '+(e.code==='auth/email-already-in-use'?'이미 있는 아이디예요':e.message));}
+}
+async function unlinkAcct(tid,silent){
+  const t=T(tid);if(!t||!t.uid)return;
+  if(!silent&&!confirm(`${t.loginId} 계정을 없앨까요?\n이 아이디로는 더 이상 로그인할 수 없어요. 수업 기록은 남아요.`))return;
+  try{await delAcct(t.uid);if(!silent){await Store.put('teachers',{...t,uid:'',loginId:''});closeM();toast('계정을 없앴어요');rerender();}}
+  catch(e){if(!silent)alert('실패: '+e.message);}
+}
+async function adminListHtml(){
+  try{_accts=await loadAccts();}catch(e){return `<div class="muted">불러오기 실패: ${esc(e.message)}</div>`;}
+  const ad=_accts.filter(a=>a.role==='admin');
+  return `<table class="dt"><tbody>${ad.map(a=>`<tr><td><b>${esc(a.name||'')}</b></td><td>${esc(a.loginId)}</td><td style="text-align:right">${a.uid===ME.uid?'<span class="muted small">나</span>':`<button class="btn sm red" onclick="removeAdmin('${a.uid}')">삭제</button>`}</td></tr>`).join('')}</tbody></table>`;
+}
+function adminModal(){
+  openM(`<div class="mh"><h3>관리자 계정 추가</h3><button class="x" onclick="closeM()">×</button></div>
+  <div class="muted small">실장님처럼 시간표·학생·재등록을 모두 관리할 사람용이에요</div>
+  <label class="l">이름</label><input class="f" id="ad-name" placeholder="예: 실장님">
+  ${acctForm('ad','예: jbmanager')}
+  <div class="mfoot"><button class="btn gray" onclick="closeM()">닫기</button><button class="btn" onclick="createAdmin()">만들기</button></div>`);
+}
+async function createAdmin(){
+  const nm=($('#ad-name').value||'').trim();if(!nm){toast('이름을 넣어주세요');return;}
+  const f=readAcctForm('ad');if(!f)return;
+  try{const uid=await makeAuthUser(f.id,f.pw);await saveAcct({uid,role:'admin',loginId:f.id,name:nm,createdAt:Date.now()});
+    closeM();alert(`✅ 관리자 계정을 만들었어요\n\n아이디: ${f.id}\n비밀번호: ${f.pw}`);rerender();}
+  catch(e){alert('만들기 실패: '+(e.code==='auth/email-already-in-use'?'이미 있는 아이디예요':e.message));}
+}
+async function removeAdmin(uid){const a=_accts.find(x=>x.uid===uid);if(!confirm(`${a.name}(${a.loginId}) 관리자 계정을 없앨까요?`))return;await delAcct(uid);toast('없앴어요');rerender();}
+function pwModal(){
+  openM(`<div class="mh"><h3>비밀번호 바꾸기</h3><button class="x" onclick="closeM()">×</button></div>
+  <label class="l">지금 비밀번호</label><input class="f" type="password" id="pw-cur" autocomplete="current-password">
+  <label class="l">새 비밀번호 (6자 이상)</label><input class="f" type="password" id="pw-new" autocomplete="new-password">
+  <div class="mfoot"><button class="btn gray" onclick="closeM()">취소</button><button class="btn" onclick="changePw()">바꾸기</button></div>`);
+}
+async function changePw(){
+  const cur=$('#pw-cur').value,nw=$('#pw-new').value;if(nw.length<6){toast('새 비밀번호는 6자 이상');return;}
+  if(DEMO){closeM();toast('체험 모드에서는 바뀌지 않아요');return;}
+  try{const u=firebase.auth().currentUser;await u.reauthenticateWithCredential(firebase.auth.EmailAuthProvider.credential(u.email,cur));await u.updatePassword(nw);closeM();toast('✅ 비밀번호를 바꿨어요');}
+  catch(e){alert(e.code==='auth/wrong-password'||e.code==='auth/invalid-credential'||e.code==='auth/invalid-login-credentials'?'지금 비밀번호가 맞지 않아요':'실패: '+e.message);}
+}
+
+/* ---------- 모달 ---------- */
+function openM(h){closeM();const o=document.createElement('div');o.className='ov';o.id='ov';o.innerHTML=`<div class="md">${h}</div>`;o.addEventListener('click',e=>{if(e.target===o)closeM();});document.body.appendChild(o);}
+function closeM(){const o=$('#ov');if(o)o.remove();}
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeM();});
+
+/* ============ 초기 데이터: 구글 일정표 11월(9~14일) ============ */
+// 선생님: [이름, 과목, 요일, 기본 레슨룸]
+const SEED_T=[['김선우','V','월,수,목','L4'],['김다금','V','화,금','L3'],['한지예','V','목,토','L3'],['김선령','V','화,수','L3'],['장지은','V','금','L4'],['박찬우','CP','월','L1'],['한지훈','G','목','L7'],['배상준','M','월,화','L2']];
+// 시간표: [선생님, 요일(1=월..6=토), 시간, 학생 또는 '#단체수업이름', 길이(분), 레슨룸(기본과 다를 때), 구분]
+const SEED_S=[
+ ['김선우',3,'15:00','박금옥'],['김선우',1,'16:00','최은서'],['김선우',3,'16:00','양소미',60,'','KA'],['김선우',1,'17:00','김로희'],['김선우',1,'18:00','서루희',60,'','KA'],['김선우',3,'18:00','이디아'],['김선우',4,'18:00','송찬호'],['김선우',1,'19:00','최서영'],['김선우',4,'19:00','윤별'],['김선우',3,'20:00','전하연'],['김선우',4,'20:00','#단체보컬수업',60,'JB홀'],
+ ['김다금',5,'16:00','최소민',60,'','KA'],['김다금',5,'17:00','이소윤',60,'','KA'],['김다금',5,'18:00','김민나',120],['김다금',5,'20:00','신이정',60,'','H'],
+ ['한지예',6,'12:00','최평솔'],['한지예',6,'13:00','조한',60,'','E'],['한지예',4,'21:00','이다은',60,'','KA'],
+ ['김선령',2,'17:00','최서우'],['김선령',3,'17:00','김하율',120,'','KA'],['김선령',2,'18:00','민윤지'],['김선령',2,'20:00','#보컬디자인',120,'JB홀'],['김선령',3,'20:00','김의진'],
+ ['장지은',5,'17:00','유나경',60,'','KA'],['장지은',5,'18:00','박다솜',60,'','KA'],
+ ['배상준',1,'17:00','김효정'],['배상준',1,'18:00','송찬호'],['배상준',1,'19:00','한정석'],['배상준',2,'19:00','김리헌',60,'','A'],['배상준',2,'20:00','우재영T'],['배상준',2,'21:00','최광현',60,'','A']
+];
+async function seedData(silent){
+  if(S.teachers.length&&!silent)return;
+  if(!silent&&!confirm('구글 일정표 11월(9~14일) 시간표로 시작할까요?'))return;
+  const FROM=DEMO?'2026-10-26':'2026-11-09';
+  const tid={};
+  for(let i=0;i<SEED_T.length;i++){const[n,subj,days,room]=SEED_T[i];const t=await Store.put('teachers',{name:n,subj,days,room,color:TCOLORS[i%TCOLORS.length],order:i});tid[n]=t.id;}
+  const sid={};
+  for(const row of SEED_S){const nm=row[3];if(nm.startsWith('#')||sid[nm])continue;const st=await Store.put('students',{name:nm,created:FROM});sid[nm]=st.id;}
+  for(const[tn,day,time,who,dur,room,kind]of SEED_S){
+    const t=SEED_T.find(x=>x[0]===tn);
+    const o={tid:tid[tn],day,time,dur:dur||60,room:room||t[3],kind:kind||'',from:FROM,to:''};
+    if(who.startsWith('#')){o.sid=null;o.label=who.slice(1);}else o.sid=sid[who];
+    await Store.put('slots',o);
+  }
+  if(DEMO){ // 체험용 수업 기록 몇 개
+    const lt=[['최소민','Spicy-에스파'],['이소윤','Golden'],['김민나','내 이름 맑음'],['신이정','Strawberry moon']];
+    const sl=n=>S.slots.find(s=>s.sid===sid[n]);
+    for(const[n,title]of lt){const s=sl(n);await Store.put('regs',{sid:s.sid,tid:s.tid,start:'2026-10-30',total:4,done0:0});
+      for(const d of ['2026-10-30','2026-11-06']){await Store.put('lessons',{date:d,time:s.time,tid:s.tid,sid:s.sid,slotId:s.id,room:s.room,kind:s.kind,title,status:d==='2026-11-06'&&n==='김민나'?'결석':'출석',memo:''});}
+    }
+    const s=sl('신이정');await Store.put('lessons',{date:'2026-11-13',time:s.time,tid:s.tid,sid:s.sid,slotId:s.id,room:s.room,kind:s.kind,title:'Strawberry moon',status:'출석',memo:'고음 처리 좋아짐'});
+    for(const n of ['서루희','양소미']){const x=sl(n);await Store.put('regs',{sid:x.sid,tid:x.tid,start:'2026-11-09',total:4,done0:3});}
+  }
+  if(!DEMO){S.cfg.startDate=today();await Store.saveCfg();}
+  if(!silent){toast('✅ 이번 주 시간표를 넣었어요');V.tab='tt';render();}
+}
+
+boot();
+</script>
+</body>
+</html>
