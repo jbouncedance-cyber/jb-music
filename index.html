@@ -97,6 +97,38 @@ table.log th{font-size:12px;color:var(--gy);font-weight:700;text-align:left;padd
 table.log td{padding:8px 6px;border-bottom:1px solid #EEF0F3;vertical-align:top}
 table.log tr{cursor:pointer}
 table.log tr:hover td{background:#FAFCFD}
+/* 홈 */
+.hero{position:relative;overflow:hidden;border-radius:20px;padding:26px 22px;color:#fff;background:linear-gradient(135deg,#14213D 0%,#1F3A5F 55%,#1F6F78 100%);margin-bottom:16px}
+.hero:after{content:'';position:absolute;right:-60px;top:-60px;width:240px;height:240px;border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,.14),rgba(255,255,255,0) 70%)}
+.hero .eyebrow{font-size:12px;font-weight:800;letter-spacing:3px;opacity:.75}
+.hero h1{font-size:30px;letter-spacing:1px;margin:4px 0 2px;font-weight:900}
+.hero .hi{opacity:.85;font-size:14.5px}
+.hstats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:18px;position:relative;z-index:1}
+.hstat{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18);border-radius:14px;padding:11px 12px;text-align:left;color:#fff;cursor:pointer}
+.hstat:hover{background:rgba(255,255,255,.16)}
+.hstat .v{font-size:24px;font-weight:900;line-height:1.1}
+.hstat .n{font-size:12px;opacity:.8;font-weight:700}
+.hstat.warn .v{color:#FFD27A}
+.hsec{display:flex;align-items:baseline;gap:8px;margin:18px 2px 10px}
+.hsec h3{margin:0;font-size:16px}
+.subj-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.subj{background:var(--wh);border:1px solid var(--bd);border-radius:18px;padding:16px 14px;cursor:pointer;text-align:left;transition:transform .12s,box-shadow .12s;position:relative;overflow:hidden}
+.subj:hover{transform:translateY(-2px);box-shadow:0 8px 22px rgba(20,33,61,.08)}
+.subj .ic{width:46px;height:46px;border-radius:14px;display:flex;align-items:center;justify-content:center;margin-bottom:12px}
+.subj .ic svg{width:26px;height:26px}
+.subj .nm{font-size:17px;font-weight:900}
+.subj .en{font-size:11px;font-weight:800;letter-spacing:1.5px;color:var(--gy2)}
+.subj .meta{font-size:12.5px;color:var(--gy);margin-top:6px}
+.subj .alert{position:absolute;top:12px;right:12px}
+.quick{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.qk{background:var(--wh);border:1px solid var(--bd);border-radius:16px;padding:14px;display:flex;align-items:center;gap:12px;cursor:pointer;text-align:left}
+.qk:hover{border-color:var(--ac)}
+.qk .qi{width:38px;height:38px;border-radius:12px;background:var(--acb);color:var(--ac);display:flex;align-items:center;justify-content:center;flex:0 0 auto}
+.qk .qi svg{width:20px;height:20px}
+.qk b{display:block;font-size:14.5px}
+.qk span{font-size:12px;color:var(--gy)}
+.tdy{background:var(--wh);border:1px solid var(--bd);border-radius:16px;padding:6px 14px}
+@media(max-width:760px){.subj-grid,.quick{grid-template-columns:repeat(2,1fr)}.hero h1{font-size:26px}.hstat .v{font-size:21px}}
 /* 수업일지 */
 .sgtabs{display:flex;gap:6px;overflow-x:auto;margin-bottom:10px}
 .sgtabs button{padding:9px 16px;border-radius:12px;font-weight:800;font-size:15px;background:var(--wh);border:1px solid var(--bd);color:var(--ink2);white-space:nowrap}
@@ -209,7 +241,7 @@ const stPill=s=>s?`<span class="pill st-${s}">${s}</span>`:`<span class="pill st
 /* ---------- 상태 ---------- */
 let S={teachers:[],students:[],slots:[],lessons:[],regs:[],cfg:{rooms:ROOMS_DEFAULT.slice()},olderLoaded:{}};
 let ME=null; // {uid,name,admin,tid,loginId}
-let V={tab:'log',lgSubj:null,lgTid:null,lgSid:null,lgQ:'',lgPast:false,lgOffT:false,date:today(),week:monday(today()),ttMode:'teacher',ttMine:true,ttDay:null,stuQ:'',stuKind:'',stuTid:'',stuId:null,showOff:false};
+let V={tab:'home',lgSubj:null,lgTid:null,lgSid:null,lgQ:'',lgPast:false,lgOffT:false,date:today(),week:monday(today()),ttMode:'teacher',ttMine:true,ttDay:null,stuQ:'',stuKind:'',stuTid:'',stuId:null,showOff:false};
 
 /* ---------- 저장소 (Firebase 또는 체험모드) ---------- */
 const LS_KEY='jbmusic_demo_v1';
@@ -410,18 +442,18 @@ function boot(){
 }
 
 /* ---------- 화면 틀 ---------- */
-function tabsList(){const t=[['log','수업일지'],['today','오늘 수업'],['tt','시간표']];if(ME.admin)t.push(['dash','현황판']);t.push(['set',ME.admin?'설정':'내 정보']);return t;}
+function tabsList(){const t=[['home','홈'],['log','수업일지'],['today','오늘 수업'],['tt','시간표']];if(ME.admin)t.push(['dash','현황판']);t.push(['set',ME.admin?'설정':'내 정보']);return t;}
 function render(){
   calc();
   const roleTxt=ME.admin?'관리자':'선생님';
   if(!$('#shell')){
-    $('#app').innerHTML=`<div id="shell"><div class="top"><div class="logo">JB MUSIC<small>수업 관리</small></div>${DEMO?'<span class="demo-tag">체험 모드</span>':''}<div class="me" id="me"></div></div>
+    $('#app').innerHTML=`<div id="shell"><div class="top"><div class="logo" style="cursor:pointer" onclick="go('home')">JB MUSIC<small>수업 관리</small></div>${DEMO?'<span class="demo-tag">체험 모드</span>':''}<div class="me" id="me"></div></div>
     <div class="tabs" id="tabs"></div><main id="main"></main></div>`;
   }
   $('#me').innerHTML=`${esc(ME.name)} · ${roleTxt}`;
   $('#tabs').innerHTML=tabsList().map(([k,n])=>`<button class="${V.tab===k?'on':''}" onclick="go('${k}')">${n}</button>`).join('');
   const m=$('#main');
-  ({log:viewLog,today:viewToday,tt:viewTT,stu:viewStu,dash:viewDash,set:viewSet}[V.tab]||viewLog)(m);
+  ({home:viewHome,log:viewLog,today:viewToday,tt:viewTT,stu:viewStu,dash:viewDash,set:viewSet}[V.tab]||viewLog)(m);
 }
 function go(t){V.tab=t;if(t!=='stu')V.stuId=null;render();window.scrollTo(0,0);}
 function rerender(){const y=window.scrollY;render();window.scrollTo(0,y);}
@@ -689,6 +721,57 @@ async function endSlot(){
   if(!hasLessons&&confirm('아직 기록이 없는 수업이에요. 시간표에서 아예 지울까요?\n([취소]를 누르면 날짜 기준으로 종료만 해요)')){await Store.del('slots',o.id);closeM();toast('지웠어요');rerender();return;}
   if(!confirm(`${fmtD(d)}부터 이 수업을 시간표에서 뺄까요? (이전 기록은 남아요)`))return;
   await Store.put('slots',{...S.slots.find(x=>x.id===o.id),to:addD(d,-1)});closeM();toast('✅ 종료했어요');rerender();
+}
+
+/* ============ 홈 ============ */
+const ICON={
+ V:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="2.5" width="6" height="11.5" rx="3"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0"/><path d="M12 17.5V21"/><path d="M8.5 21h7"/></svg>',
+ CP:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="4" width="19" height="16" rx="2.5"/><path d="M8 4v16M12 4v16M16 4v16"/><path d="M6.5 4v8.5h3V4M14.5 4v8.5h3V4" fill="currentColor"/></svg>',
+ G:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 9.5 20 4"/><path d="M18.5 2.5 21.5 5.5"/><path d="M10.6 9.2a4 4 0 0 0-5.3.6c-1 1.1-.9 2.4-.4 3.3-1.3.3-2.4 1.3-2.4 2.9 0 2.2 2.6 4.8 4.8 4.8 1.6 0 2.6-1.1 2.9-2.4.9.5 2.2.6 3.3-.4a4 4 0 0 0 .6-5.3"/><circle cx="9.5" cy="14.5" r="1.4"/><path d="M12 12 14.5 9.5"/></svg>',
+ M:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 15v-3a8.5 8.5 0 0 1 17 0v3"/><rect x="2.5" y="14" width="4.5" height="7" rx="1.8"/><rect x="17" y="14" width="4.5" height="7" rx="1.8"/></svg>',
+ ETC:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><circle cx="8" cy="17" r="3"/><path d="M11 17V5l9-2v12"/><circle cx="17" cy="15" r="3"/></svg>',
+ today:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l2 2 4-4"/><rect x="3" y="4" width="18" height="17" rx="3"/><path d="M8 2v4M16 2v4"/></svg>',
+ tt:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="4" width="18" height="17" rx="3"/><path d="M3 10h18M9 4v17M15 4v17"/></svg>',
+ dash:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>',
+ set:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>'
+};
+const SG_STYLE={V:{c:'#db2777',b:'#fdf0f6',en:'VOCAL'},CP:{c:'#2563eb',b:'#eef3ff',en:'PIANO · COMPOSE'},G:{c:'#b45309',b:'#fff4e3',en:'GUITAR'},M:{c:'#7c3aed',b:'#f3eeff',en:'MIDI'},ETC:{c:'#0f766e',b:'#e8f6f4',en:'ETC'}};
+function openSubject(k){V.tab='log';V.lgSubj=k;V.lgTid=null;V.lgSid=null;V.lgQ='';render();window.scrollTo(0,0);}
+function viewHome(m){
+  const d=today();const dd=pd(d);
+  const tids=ME.admin?activeTeachers().map(t=>t.id):[myTid()].filter(Boolean);
+  let todayN=0,todayDone=0;const todayItems=[];
+  tids.forEach(tid=>{occ(d,tid).forEach(s=>{if(!s.sid)return;todayN++;const l=lessonOf(s,d);if(l)todayDone++;todayItems.push({s,l});});});
+  todayItems.sort((a,b)=>a.s.time.localeCompare(b.s.time));
+  let miss=0;tids.forEach(t=>miss+=missingLessons(t).length);
+  const renew=pairsActive().filter(p=>(ME.admin||p.tid===myTid())&&!pairOf(p.sid,p.tid).noReg&&pairOf(p.sid,p.tid).left<=0).length;
+  const ts=logTeachers();
+  const groups=SGROUP.map(g=>({...g,ts:ts.filter(t=>groupOf(t.subj)===g.k)})).filter(g=>g.ts.length||(ME.admin&&g.k!=='ETC'));
+  let h=`<div class="hero"><div class="eyebrow">JB ACADEMY · MUSIC</div><h1>JB MUSIC</h1>
+  <div class="hi">${esc(ME.name)}님, 안녕하세요 · ${dd.getMonth()+1}월 ${dd.getDate()}일 ${DOW[dd.getDay()]}요일</div>
+  <div class="hstats">
+   <button class="hstat" onclick="V.date=today();go('today')"><div class="v">${todayDone}<span style="font-size:15px;opacity:.7">/${todayN}</span></div><div class="n">오늘 수업 기록</div></button>
+   <button class="hstat ${miss?'warn':''}" onclick="V.date=today();go('today')"><div class="v">${miss}</div><div class="n">기록 안 한 수업</div></button>
+   <button class="hstat ${renew?'warn':''}" onclick="go('${ME.admin?'dash':'log'}')"><div class="v">${renew}</div><div class="n">재등록 필요</div></button>
+  </div></div>`;
+  h+=`<div class="hsec"><h3>수업일지</h3><span class="muted small">과목을 누르면 선생님별 학생과 수업기록이 나와요</span></div><div class="subj-grid">`;
+  groups.forEach(g=>{const st=SG_STYLE[g.k];
+    const stuSet=new Set();let rn=0;g.ts.forEach(t=>studentsOfTeacher(t.id).cur.forEach(x=>{stuSet.add(x.sid);const p=pairOf(x.sid,t.id);if(!p.noReg&&p.left<=0)rn++;}));
+    h+=`<button class="subj" onclick="openSubject('${g.k}')"><div class="ic" style="background:${st.b};color:${st.c}">${ICON[g.k]}</div>
+    <div class="en">${st.en}</div><div class="nm">${g.t}</div><div class="meta">선생님 ${g.ts.length} · 학생 ${stuSet.size}</div>
+    ${rn?`<span class="alert pill" style="background:var(--nob);color:var(--no)">재등록 ${rn}</span>`:''}</button>`;});
+  h+=`</div>`;
+  const q=[['today','오늘 수업',todayN?`${todayN}개 중 ${todayDone}개 기록`:'오늘은 수업이 없어요'],['tt','시간표','선생님별 · 레슨룸별']];
+  if(ME.admin)q.push(['dash','현황판','재등록 · 출결 현황']);
+  q.push(['set',ME.admin?'설정':'내 정보',ME.admin?'선생님 · 계정 · 레슨룸':'비밀번호 바꾸기']);
+  h+=`<div class="hsec"><h3>바로가기</h3></div><div class="quick">${q.map(([k,n,sub])=>`<button class="qk" onclick="${k==='today'?'V.date=today();':''}go('${k}')"><span class="qi">${ICON[k]}</span><div><b>${n}</b><span>${sub}</span></div></button>`).join('')}</div>`;
+  if(todayItems.length){
+    h+=`<div class="hsec"><h3>오늘 수업</h3><span class="muted small">${todayItems.length}개</span><div class="sp"></div><button class="btn sm ghost" onclick="V.date=today();go('today')">전체 보기</button></div><div class="tdy">`;
+    todayItems.slice(0,8).forEach(({s,l})=>{h+=`<div class="lrow" onclick="openLesson('${s.id}','${d}')" style="cursor:pointer"><div class="t">${esc(s.time)}<small>${esc(s.room||'')}</small></div><div class="who"><b>${esc(sName(s.sid))}</b> ${kindBadge(s.kind)}<div class="sub">${esc(SUBJ[(T(s.tid)||{}).subj]||'')} · ${esc(tName(s.tid))}T</div></div><div>${l?stPill(l.status):nextCountLabel(s.sid,s.tid)}</div></div>`;});
+    if(todayItems.length>8)h+=`<div class="muted small" style="padding:8px 4px">외 ${todayItems.length-8}개 · 오늘 수업에서 모두 볼 수 있어요</div>`;
+    h+=`</div>`;
+  }
+  m.innerHTML=h;
 }
 
 /* ============ 수업일지 (과목 → 선생님 → 학생 → 기록) ============ */
